@@ -195,13 +195,13 @@ namespace expr
 				return Action::minus;
 			case '*':
 				return Action::mult;
-			case '/':
-				return Action::div;
 			case '%':
 				return Action::rdiv;
 			case '^':
 				return Action::pow;
 			default:
+				if (s == "/")
+					return Action::div;
 				if (s == "//")
 					return Action::idiv;
 				if (s == "nrt")
