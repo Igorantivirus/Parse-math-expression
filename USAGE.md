@@ -31,6 +31,7 @@ The project contains a set of 3 .hpp files:
     - `pi`: 3.1415926535897932
     - `e`: 2.718281828459045
 5. `(a)d` - convert number `a` from degrees to radian
+6. `(a)r` - convert number `a` from radian to degrees
 
 ## Functions
 1. **Trigonometry**
