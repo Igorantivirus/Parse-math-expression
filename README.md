@@ -1,12 +1,12 @@
 # Parse-math-expression
 
-## Описание
-Проект представляет собой парсер строки в математическое выражение с последующим его решением.
+## Description
+The project is a parser for a string into a mathematical expression followed by its solution.
 
-## Установка
-Для установки скопируйте все файлы `.hpp` из репозитория и подключите их к вашему проекту.
+## Installation
+To install, copy all `.hpp` files from the repository and include them in your project.
 
-## Пример использования
+## Example Usage
 ```cpp
 #include <iostream>
 #include "MathPars.hpp"
@@ -20,7 +20,7 @@ int main()
 
     while (true)
     {
-        std::cout << "Введите выражение: ";
+        std::cout << "Enter expression: ";
         std::getline(std::cin, s);
 
         std::cout << parser.parse(s).getProcessingResult().getValue() << '\n';
