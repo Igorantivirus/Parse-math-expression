@@ -32,6 +32,7 @@ The project contains a set of 3 .hpp files:
     - `e`: 2.718281828459045
 5. `(a)d` - convert number `a` from degrees to radian
 6. `(a)r` - convert number `a` from radian to degrees
+7. `i` - imaginary unit `i=sqrt(-1)`
 
 ## Functions
 1. **Trigonometry**
