@@ -7,12 +7,8 @@
 
 #include"MathEnums.hpp"
 
-#define PI_val 3.1415926535897932l
-
 namespace expr
 {
-	using FType = double;
-
 	class ExpressionBase
 	{
 	public:
@@ -199,6 +195,8 @@ namespace expr
 				return PI_val / 2 - std::atan(v);
 			case FunctionType::fact:
 				return std::tgamma(v + 1);
+			case FunctionType::degrees:
+				return toRadian(v);
 			default:
 				return 0;
 			}

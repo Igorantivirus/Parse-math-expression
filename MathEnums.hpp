@@ -3,8 +3,12 @@
 #include<string>
 #include<iostream>
 
+#define PI_val 3.1415926535897932l
+
 namespace expr
 {
+	using FType = double;
+
 	enum class Action : char
 	{
 		none = 0,		//
@@ -32,7 +36,8 @@ namespace expr
 		arccos,	//acos(x)
 		arctg,	//atan(x)
 		arcctg,	//pi/2-atan(x)
-		fact	//tgamma(x+1)
+		fact,	//tgamma(x+1)
+		degrees	//convert degrees to radian
 	};
 	enum class Brackets : char
 	{
@@ -157,5 +162,10 @@ namespace expr
 		default:
 			break;
 		}
+	}
+
+	FType toRadian(const FType& g)
+	{
+		return g * PI_val / 180.l;
 	}
 }

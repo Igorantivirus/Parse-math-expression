@@ -105,10 +105,10 @@ namespace expr
 		{
 			if (i + 1 != tkns.size())
 			{
-				if (tkns[i + 1][0] == '!')
+				if (specialFunc(tkns[i + 1][0]))
 				{
 					Function prf;
-					prf.setType(FunctionType::fact);
+					prf.setType(parseSpecialType(tkns[i + 1][0]));
 					prf.setArg(value);
 					i++;
 					if (i + 1 != tkns.size())
@@ -255,9 +255,22 @@ namespace expr
 				return FunctionType::arcctg;
 			if (s == "fact")
 				return FunctionType::fact;
+			if (s == "d")
+				return FunctionType::degrees;
 			return FunctionType::none;
 		}
+		FunctionType parseSpecialType(const char c)
+		{
+			if (c == '!')
+				return FunctionType::fact;
+			if (c == 'd')
+				return FunctionType::degrees;
+		}
 
+		bool specialFunc(const char c)
+		{
+			return c == 'd' || c == '!';
+		}
 		bool isOpenBracket(const char c)
 		{
 			return c == '(' || c == '{' || c == '[' || c == '<';
