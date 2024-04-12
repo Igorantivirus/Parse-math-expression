@@ -2,12 +2,14 @@
 
 #include<string>
 #include<iostream>
+#include<complex>
 
 #define PI_val 3.1415926535897932l
 
 namespace expr
 {
-	using FType = double;
+	using FType = std::complex<long double>;
+	//using FType = long double;
 
 	enum class Action : char
 	{
@@ -37,8 +39,8 @@ namespace expr
 		arctg,	//atan(x)
 		arcctg,	//pi/2-atan(x)
 		fact,	//tgamma(x+1)
-		degrees,	//convert degrees to radian
-		radian	//convert radian to degrees
+		degrees,//convert degrees to radian
+		radian,	//convert radian to degrees
 	};
 	enum class Brackets : char
 	{
@@ -167,10 +169,48 @@ namespace expr
 
 	FType toRadian(const FType& g)
 	{
-		return g * PI_val / 180.l;
+		return g * FType(PI_val / 180.l);
 	}
 	FType toDegrees(const FType& g)
 	{
-		return g * 180.l / PI_val;
+		return g * FType(180.l / PI_val);
 	}
+
+	FType myFloor(FType v)
+	{
+		v.real(std::floor(v.real()));
+		v.imag(std::floor(v.imag()));
+		return v;
+	}
+	FType myFrac(FType v)
+	{
+		return v - myFloor(v);
+	}
+	FType myFmod(FType x, FType y)
+	{
+		FType quotient = x / y;
+		auto a = quotient.real();
+		auto b = quotient.imag();
+		std::modf(a, &a);
+		std::modf(b, &b);
+		FType integer_part(a, b);
+		return x - integer_part * y;
+	}
+
+	FType realToImag(FType a)
+	{
+		a.imag(a.real());
+		a.real(0);
+		return a;
+	}
+
+	FType toFType(const std::string& str)
+	{
+		auto pr = std::stold(str);
+		if (str.back() == 'i')
+			return std::complex<double>(0, pr);
+		return std::complex<double>(pr, 0);
+	}
+
+
 }

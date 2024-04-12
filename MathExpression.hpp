@@ -176,7 +176,7 @@ namespace expr
 			case FunctionType::ln:
 				return std::log(v);
 			case FunctionType::lg:
-				return std::log(v) / std::log(10);
+				return std::log10(v);
 			case FunctionType::sin:
 				return std::sin(v);
 			case FunctionType::cos:
@@ -184,7 +184,7 @@ namespace expr
 			case FunctionType::tg:
 				return std::tan(v);
 			case FunctionType::ctg:
-				return 1 / std::tan(v);
+				return FType(1) / std::tan(v);
 			case FunctionType::arcsin:
 				return std::asin(v);
 			case FunctionType::arccos:
@@ -192,9 +192,9 @@ namespace expr
 			case FunctionType::arctg:
 				return std::atan(v);
 			case FunctionType::arcctg:
-				return PI_val / 2 - std::atan(v);
+				return FType(PI_val / 2) - std::atan(v);
 			case FunctionType::fact:
-				return std::tgamma(v + 1);
+				return std::tgamma(v.real() + 1);
 			case FunctionType::degrees:
 				return toRadian(v);
 			case FunctionType::radian:
@@ -246,9 +246,9 @@ namespace expr
 			thirdProcessed(vls);
 
 			if (brk == Brackets::round)
-				vls[0].setValue(std::floor(vls[0].getValue()));
+				vls[0].setValue(myFloor(vls[0].getValue()));
 			if (brk == Brackets::frac)
-				vls[0].setValue(vls[0].getValue() - std::floor(vls[0].getValue()));
+				vls[0].setValue(myFrac(vls[0].getValue()));
 			if (brk == Brackets::modul)
 				vls[0].setValue(std::abs(vls[0].getValue()));
 			vls[0].setNextAction(next);
@@ -304,7 +304,7 @@ namespace expr
 					if (vls[i].getNextAction() == Action::pow)
 						pr.setValue(std::pow(vls[i].getValue(), vls[i + 1].getValue()));
 					else if (vls[i].getNextAction() == Action::nrt)
-						pr.setValue(std::pow(vls[i + 1].getValue(), 1 / vls[i].getValue()));
+						pr.setValue(std::pow(vls[i + 1].getValue(), FType(1) / vls[i].getValue()));
 					else if (vls[i].getNextAction() == Action::log)
 						pr.setValue(std::log(vls[i + 1].getValue()) / std::log(vls[i].getValue()));
 					pr.setNextAction(vls[i + 1].getNextAction());
@@ -326,9 +326,9 @@ namespace expr
 					else if (vls[i].getNextAction() == Action::div)
 						pr.setValue(vls[i].getValue() / vls[i + 1].getValue());
 					else if (vls[i].getNextAction() == Action::rdiv)
-						pr.setValue(std::fmod(vls[i].getValue(), vls[i + 1].getValue()));
+						pr.setValue(myFmod(vls[i].getValue(), vls[i + 1].getValue()));
 					else if (vls[i].getNextAction() == Action::idiv)
-						pr.setValue(std::round(vls[i].getValue() / vls[i + 1].getValue()));
+						pr.setValue(myFloor(vls[i].getValue() / vls[i + 1].getValue()));
 
 					pr.setNextAction(vls[i + 1].getNextAction());
 					vls[i] = pr;

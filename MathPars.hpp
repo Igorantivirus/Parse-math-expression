@@ -49,7 +49,7 @@ namespace expr
 			{
 				if (isNum(tkns[i]))
 				{
-					Value prv = std::stold(tkns[i]);
+					Value prv = toFType(tkns[i]);
 					fillAction(expr, prv, tkns, i);
 				}
 				else if (isWord(tkns[i]))
@@ -66,7 +66,7 @@ namespace expr
 					}
 					else if (tkns[i] == "inf")
 					{
-						Value prv = 1.l / std::sin(0.l);
+						Value prv = FType(1.l / std::sin(0.l));
 						fillAction(expr, prv, tkns, i);
 						continue;
 					}
@@ -85,7 +85,7 @@ namespace expr
 				}
 				else if (tkns[i][0] == '-')
 				{
-					Value prv = -1;
+					Value prv = FType(-1);
 					prv.setNextAction(Action::mult);
 					expr.add(prv);
 				}
@@ -143,7 +143,7 @@ namespace expr
 			size_t pos;
 			while ((pos = str.find('|')) != std::string::npos)
 			{
-				if (!(str[pos - 1] >= '0' && str[pos - 1] <= '9') && !isCloseBracket(str[pos - 1]) && str[pos - 1] != '|' && !specialFunc(str[pos - 1]))
+				if (!(str[pos - 1] >= '0' && str[pos - 1] <= '9') && !isCloseBracket(str[pos - 1]) && str[pos - 1] != 'i' && str[pos - 1] != '|' && !specialFunc(str[pos - 1]))
 					str[pos] = '<';
 				else
 					str[pos] = '>';
@@ -173,12 +173,24 @@ namespace expr
 					}
 				}
 			}
+			if (tokens[0][0] == 'i')
+				tokens[0] = "1i";
 			for (size_t i = tokens.size() - 1; i > 0; --i)
 			{
 				if (isCloseBracket(tokens[i][0]))
 				{
 					tokens[i - 1] += tokens[i];
 					tokens.erase(tokens.begin() + i);
+				}
+				else if (tokens[i][0] == 'i')
+				{
+					if (isNum(tokens[i - 1]))
+					{
+						tokens[i - 1].push_back('i');
+						tokens.erase(tokens.begin() + i);
+					}
+					else
+						tokens[i] = "1i";
 				}
 			}
 		}
@@ -195,8 +207,6 @@ namespace expr
 				return Action::minus;
 			case '*':
 				return Action::mult;
-			case '/':
-				return Action::div;
 			case '%':
 				return Action::rdiv;
 			case '^':
@@ -204,6 +214,8 @@ namespace expr
 			default:
 				if (s == "//")
 					return Action::idiv;
+				if (s == "/")
+					return Action::div;
 				if (s == "nrt")
 					return Action::nrt;
 				return Action::none;
