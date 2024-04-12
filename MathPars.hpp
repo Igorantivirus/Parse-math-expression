@@ -143,7 +143,7 @@ namespace expr
 			size_t pos;
 			while ((pos = str.find('|')) != std::string::npos)
 			{
-				if (!(str[pos - 1] >= '0' && str[pos - 1] <= '9') && str[pos - 1] != ')' && str[pos - 1] != ']' && str[pos - 1] != '}' && str[pos - 1] != '|')
+				if (!(str[pos - 1] >= '0' && str[pos - 1] <= '9') && !isCloseBracket(str[pos - 1]) && str[pos - 1] != '|' && !specialFunc(str[pos - 1]))
 					str[pos] = '<';
 				else
 					str[pos] = '>';
