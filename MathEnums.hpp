@@ -37,7 +37,8 @@ namespace expr
 		arctg,	//atan(x)
 		arcctg,	//pi/2-atan(x)
 		fact,	//tgamma(x+1)
-		degrees	//convert degrees to radian
+		degrees,	//convert degrees to radian
+		radian	//convert radian to degrees
 	};
 	enum class Brackets : char
 	{
@@ -167,5 +168,9 @@ namespace expr
 	FType toRadian(const FType& g)
 	{
 		return g * PI_val / 180.l;
+	}
+	FType toDegrees(const FType& g)
+	{
+		return g * 180.l / PI_val;
 	}
 }

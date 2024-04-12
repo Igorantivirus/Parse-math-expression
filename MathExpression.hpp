@@ -197,6 +197,8 @@ namespace expr
 				return std::tgamma(v + 1);
 			case FunctionType::degrees:
 				return toRadian(v);
+			case FunctionType::radian:
+				return toDegrees(v);
 			default:
 				return 0;
 			}

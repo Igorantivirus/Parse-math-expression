@@ -265,11 +265,14 @@ namespace expr
 				return FunctionType::fact;
 			if (c == 'd')
 				return FunctionType::degrees;
+			if (c == 'r')
+				return FunctionType::radian;
+			return FunctionType::none;
 		}
 
 		bool specialFunc(const char c)
 		{
-			return c == 'd' || c == '!';
+			return c == 'd' || c == '!' || c == 'r';
 		}
 		bool isOpenBracket(const char c)
 		{
