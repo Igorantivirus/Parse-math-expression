@@ -3,7 +3,7 @@
 #include<stack>
 #include<regex>
 
-#include<boost/algorithm/string.hpp>
+#include"MathExpressionErrors.hpp"
 
 #include"MathExpression.hpp"
 
@@ -16,8 +16,7 @@ namespace expr
 		Expression parse(std::string& str)
 		{
 			modulEdit(str);
-			if (!goodBrackets(str))
-				return Expression();
+			goodBrackets(str);
 			constantEdit(str);
 			std::vector<std::string> tkns;
 			tokenize(str, tkns);
@@ -54,22 +53,8 @@ namespace expr
 				}
 				else if (isWord(tkns[i]))
 				{
-					if (tkns[i] == "log")
-					{
-						Expression pre1, pre2;
-						strParse(tkns[++i], pre1);
-						strParse(tkns[++i], pre2);
-						pre1.setNextAction(Action::log);
-						expr.add(pre1);
-						fillAction(expr, pre2, tkns, i);
+					if (fillSpecialWords(tkns, i, expr))
 						continue;
-					}
-					else if (tkns[i] == "inf")
-					{
-						Value prv = FType(1.l / std::sin(0.l));
-						fillAction(expr, prv, tkns, i);
-						continue;
-					}
 					Function prf;
 					prf.setType(parseFunction(tkns[i++]));
 					Expression pre;
@@ -90,15 +75,6 @@ namespace expr
 					expr.add(prv);
 				}
 			}
-		}
-
-		bool isNum(const std::string& str)
-		{
-			return str[0] >= '0' && str[0] <= '9';
-		}
-		bool isWord(const std::string& str)
-		{
-			return str[0] >= 'a' && str[0] <= 'z';
 		}
 
 		void fillAction(Expression& res, ExpressionBase& value, const std::vector<std::string>& tkns, size_t& i)
@@ -134,7 +110,28 @@ namespace expr
 			res.add(value);
 		}
 
-	private:
+		bool fillSpecialWords(const std::vector<std::string>& tkns, size_t& i, Expression& expr)
+		{
+			if (tkns[i] == "log")
+			{
+				Expression pre1, pre2;
+				strParse(tkns[++i], pre1);
+				strParse(tkns[++i], pre2);
+				pre1.setNextAction(Action::log);
+				expr.add(pre1);
+				fillAction(expr, pre2, tkns, i);
+				return true;
+			}
+			else if (tkns[i] == "inf")
+			{
+				Value prv = FType(1.l / std::sin(0.l));
+				fillAction(expr, prv, tkns, i);
+				return true;
+			}
+			return false;
+		}
+
+	private://str edit
 
 		void modulEdit(std::string& str)
 		{
@@ -152,8 +149,8 @@ namespace expr
 
 		void constantEdit(std::string& str)
 		{
-			boost::algorithm::replace_all(str, "pi", "3.1415926535897932");
-			boost::algorithm::replace_all(str, "e", "2.7182818284590452");
+			replaceAll(str, "pi", "3.1415926535897932");
+			replaceAll(str, "e", "2.7182818284590452");
 		}
 
 		void tokenize(const std::string& expression, std::vector<std::string>& tokens)
@@ -195,7 +192,7 @@ namespace expr
 			}
 		}
 
-	private:
+	private://enum parse
 
 		Action parseAction(const std::string& s)
 		{
@@ -282,6 +279,8 @@ namespace expr
 			return FunctionType::none;
 		}
 
+	private://special func
+
 		bool specialFunc(const char c)
 		{
 			return c == 'd' || c == '!' || c == 'r';
@@ -293,6 +292,14 @@ namespace expr
 		bool isCloseBracket(const char c)
 		{
 			return c == ')' || c == '}' || c == ']' || c == '>';
+		}
+		bool isNum(const std::string& str)
+		{
+			return str[0] >= '0' && str[0] <= '9';
+		}
+		bool isWord(const std::string& str)
+		{
+			return str[0] >= 'a' && str[0] <= 'z';
 		}
 		char oppositeBracket(const char c)
 		{
@@ -309,19 +316,20 @@ namespace expr
 			default: return '\0';
 			}
 		}
-		bool goodBrackets(const std::string& str)
+		void goodBrackets(const std::string& str)
 		{
 			std::stack<char> st;
-			for (const auto& i : str)
-				if (isOpenBracket(i))
-					st.push(i);
-				else if (isCloseBracket(i))
+			for (size_t i = 0; i < str.size(); ++i)
+				if (isOpenBracket(str[i]))
+					st.push(str[i]);
+				else if (isCloseBracket(str[i]))
 				{
-					if (st.top() != oppositeBracket(i))
-						return false;
+					if (st.top() != oppositeBracket(str[i]))
+						throw ParseException("Bracket " + std::string(1, str[i]) + std::string(" not correct closed at position: " + std::to_string(i)), ParseException::ErrorType::brackets);
 					st.pop();
 				}
-			return st.empty();
+			if (!st.empty())
+				throw ParseException("Brackets " + std::string(1, st.top()) + " is not closed", {ParseException::ErrorType::brackets});
 		}
 
 	};

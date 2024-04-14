@@ -212,5 +212,17 @@ namespace expr
 		return std::complex<double>(pr, 0);
 	}
 
+	void replaceAll(std::string& str, const char* oldS, const char* newS)
+	{
+		const size_t s1 = std::strlen(oldS);
+		const size_t s2 = std::strlen(newS);
+		size_t ind;
+		size_t last = 0;
+		while ((ind = str.find(oldS, last)) != std::string::npos)
+		{
+			str.replace(ind, s1, newS);
+			last = ind + s2;
+		}
+	}
 
 }
