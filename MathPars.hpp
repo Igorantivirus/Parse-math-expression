@@ -74,6 +74,8 @@ namespace expr
 					prv.setNextAction(Action::mult);
 					expr.add(prv);
 				}
+				else if (parseAction(tkns[i]) == Action::none)
+					throw ParseException("Unknown word: \"" + tkns[i] + "\"", ParseException::ErrorType::word);
 			}
 		}
 
@@ -178,7 +180,7 @@ namespace expr
 				tokens[0] = "1i";
 			for (size_t i = tokens.size() - 1; i > 0; --i)
 			{
-				if (isCloseBracket(tokens[i][0]))
+				if (isCloseBracket(tokens[i].back()) && (tokens[i].back() == oppositeBracket(tokens[i-1][0])))
 				{
 					tokens[i - 1] += tokens[i];
 					tokens.erase(tokens.begin() + i);
