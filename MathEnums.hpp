@@ -2,12 +2,13 @@
 
 #include<string>
 #include<iostream>
+#include<complex>
 
 #define PI_val 3.1415926535897932l
 
 namespace expr
 {
-	using FType = double;
+	using FType = long double;;
 
 	enum class Action : char
 	{
@@ -37,8 +38,8 @@ namespace expr
 		arctg,	//atan(x)
 		arcctg,	//pi/2-atan(x)
 		fact,	//tgamma(x+1)
-		degrees,	//convert degrees to radian
-		radian	//convert radian to degrees
+		degrees,//convert degrees to radian
+		radian,	//convert radian to degrees
 	};
 	enum class Brackets : char
 	{
@@ -167,10 +168,42 @@ namespace expr
 
 	FType toRadian(const FType& g)
 	{
-		return g * PI_val / 180.l;
+		return g * FType(PI_val / 180.l);
 	}
 	FType toDegrees(const FType& g)
 	{
-		return g * 180.l / PI_val;
+		return g * FType(180.l / PI_val);
 	}
+
+	FType myFloor(FType v)
+	{
+		return std::floor(v);
+	}
+	FType myFrac(FType v)
+	{
+		return v - myFloor(v);
+	}
+	FType myFmod(FType x, FType y)
+	{
+		return std::fmod(x, y);
+	}
+
+	FType toFType(const std::string& str)
+	{
+		return std::stold(str);
+	}
+
+	void replaceAll(std::string& str, const char* oldS, const char* newS)
+	{
+		const size_t s1 = std::strlen(oldS);
+		const size_t s2 = std::strlen(newS);
+		size_t ind;
+		size_t last = 0;
+		while ((ind = str.find(oldS, last)) != std::string::npos)
+		{
+			str.replace(ind, s1, newS);
+			last = ind + s2;
+		}
+	}
+
 }
