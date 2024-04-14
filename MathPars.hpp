@@ -13,7 +13,7 @@ namespace expr
 	{
 	public:
 
-		Expression parse(std::string& str)
+		Expression parse(std::string str)
 		{
 			modulEdit(str);
 			goodBrackets(str);
@@ -115,6 +115,10 @@ namespace expr
 			if (tkns[i] == "log")
 			{
 				Expression pre1, pre2;
+				if (i + 2 >= tkns.size())
+					throw ParseException("The log function without arguments.", ParseException::ErrorType::func);
+				if (!((isNum(tkns[i + 1]) || isOpenBracket(tkns[i + 1][0])) && (isNum(tkns[i + 2]) || isOpenBracket(tkns[i + 2][0]))))
+					throw ParseException("The log argument is not a number.", ParseException::ErrorType::func);
 				strParse(tkns[++i], pre1);
 				strParse(tkns[++i], pre2);
 				pre1.setNextAction(Action::log);
@@ -266,7 +270,7 @@ namespace expr
 				return FunctionType::fact;
 			if (s == "d")
 				return FunctionType::degrees;
-			return FunctionType::none;
+			throw ParseException("Unknown function type: \"" + s + "\".", ParseException::ErrorType::func);
 		}
 		FunctionType parseSpecialType(const char c)
 		{

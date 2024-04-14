@@ -233,6 +233,9 @@ namespace expr
 
 		std::unique_ptr<ExpressionBase> processed() const override
 		{
+			if (values.empty())
+				return std::make_unique<Value>(Value(0, Action::plus));
+
 			std::vector<Value> vls;
 
 			for (const auto& i : values)
