@@ -13,16 +13,30 @@ namespace expr
 	{
 	public:
 
-		Expression parse(std::string str)
+		Expression parse(std::string str) throw(ParseException)
+		try
 		{
 			modulEdit(str);
-			goodBrackets(str);
+			if (!goodBrackets(str))
+				throw ParseException("Brackets error.", ParseException::ErrorType::brackets);
 			constantEdit(str);
 			std::vector<std::string> tkns;
 			tokenize(str, tkns);
 			Expression res;
 			fillExpression(tkns, res);
 			return res;
+		}
+		catch (const ParseException& e)
+		{
+			throw ParseException(e.what(), e.getType());
+		}
+		catch (const std::exception& e)
+		{
+			throw ParseException(std::string("Unknown error: ") + e.what(), ParseException::ErrorType::none);
+		}
+		catch (...)
+		{
+			throw ParseException("Unknown error: ", ParseException::ErrorType::none);
 		}
 
 	private:
@@ -58,6 +72,10 @@ namespace expr
 					Function prf;
 					prf.setType(parseFunction(tkns[i++]));
 					Expression pre;
+					if(i == tkns.size())
+						throw ParseException("Function \"" + tkns[i-1] + "\" without argument", ParseException::ErrorType::func);
+					if (!isOpenBracket(tkns[i][0]) || !isNum(tkns[i]))
+						throw ParseException("Bad function argument: \"" + tkns[i] + '\"', ParseException::ErrorType::func);
 					strParse(tkns[i], pre);
 					prf.setArg(pre);
 					fillAction(expr, prf, tkns, i);
@@ -180,12 +198,12 @@ namespace expr
 				tokens[0] = "1i";
 			for (size_t i = tokens.size() - 1; i > 0; --i)
 			{
-				if (isCloseBracket(tokens[i].back()) && !isOpenBracket(tokens[i][0]))
+				if ((isOpenBracket(tokens[i][0]) || isCloseBracket(tokens[i].back())) && !goodBrackets(tokens[i]))
 				{
 					tokens[i - 1] += tokens[i];
 					tokens.erase(tokens.begin() + i);
 				}
-				else if (tokens[i][0] == 'i')
+				else if (tokens[i] == "i")
 				{
 					if (isNum(tokens[i - 1]))
 					{
@@ -322,20 +340,20 @@ namespace expr
 			default: return '\0';
 			}
 		}
-		void goodBrackets(const std::string& str)
+
+		bool goodBrackets(const std::string& str)
 		{
-			std::stack<char> st;
-			for (size_t i = 0; i < str.size(); ++i)
-				if (isOpenBracket(str[i]))
-					st.push(str[i]);
-				else if (isCloseBracket(str[i]))
+			std::stack<char> s;
+			for (const auto& i : str)
+				if (isOpenBracket(i))
+					s.push(i);
+				else if (isCloseBracket(i))
 				{
-					if (st.top() != oppositeBracket(str[i]))
-						throw ParseException("Bracket " + std::string(1, str[i]) + std::string(" not correct closed at position: " + std::to_string(i)), ParseException::ErrorType::brackets);
-					st.pop();
+					if (s.empty() || s.top() != oppositeBracket(i))
+						return false;
+					s.pop();
 				}
-			if (!st.empty())
-				throw ParseException("Brackets " + std::string(1, st.top()) + " is not closed", {ParseException::ErrorType::brackets});
+			return s.empty();
 		}
 
 	};

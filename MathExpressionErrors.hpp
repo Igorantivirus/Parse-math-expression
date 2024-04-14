@@ -27,6 +27,11 @@ namespace expr
 			return msg;
 		}
 
+		ErrorType getType() const
+		{
+			return type;
+		}
+
 	private:
 		std::string msg;
 		ErrorType type;
