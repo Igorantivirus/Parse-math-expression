@@ -29,7 +29,7 @@ namespace expr
 
 		void strParse(std::string str, Expression& res)
 		{
-			if (Brackets brk = parseBracket(str[0]); brk != Brackets::none)
+			if (Brackets brk = parseBracket(str[0]); brk != Brackets::none && str.size() > 2)
 			{
 				res.setBrackets(brk);
 				str.pop_back();
@@ -180,7 +180,7 @@ namespace expr
 				tokens[0] = "1i";
 			for (size_t i = tokens.size() - 1; i > 0; --i)
 			{
-				if (isCloseBracket(tokens[i].back()) && (tokens[i].back() == oppositeBracket(tokens[i-1][0])))
+				if (isCloseBracket(tokens[i].back()) && !isOpenBracket(tokens[i][0]))
 				{
 					tokens[i - 1] += tokens[i];
 					tokens.erase(tokens.begin() + i);
