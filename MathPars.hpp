@@ -270,7 +270,7 @@ namespace expr
 				return FunctionType::fact;
 			if (s == "d")
 				return FunctionType::degrees;
-			throw ParseException("Unknown function type: \"" + s + "\".", ParseException::ErrorType::func);
+			throw ParseException("Unknown word: \"" + s + "\".", ParseException::ErrorType::word);
 		}
 		FunctionType parseSpecialType(const char c)
 		{
@@ -303,7 +303,7 @@ namespace expr
 		}
 		bool isWord(const std::string& str)
 		{
-			return str[0] >= 'a' && str[0] <= 'z';
+			return str[0] >= 'a' && str[0] <= 'z' || str[0] >= 'A' && str[0] <= 'Z';
 		}
 		char oppositeBracket(const char c)
 		{
