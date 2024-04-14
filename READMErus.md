@@ -13,23 +13,33 @@
 
 ## Пример использования
 ```cpp
-#include <iostream>
-#include "MathPars.hpp"
+#include<iostream>
+
+#include<MathParse/MathPars.hpp>
 
 int main()
 {
-    using namespace expr;
+	using namespace expr;
+	using namespace std;
 
-    Parser parser;
-    std::string s;
+	Parser parser;
+	std::string s;
 
-    while (true)
-    {
-        std::cout << "Введите выражение: ";
-        std::getline(std::cin, s);
+	while (true)
+	{
+		std::cout << "Enter: ";
+		std::getline(std::cin, s);
 
-        std::cout << parser.parse(s).getProcessingResult().getValue() << '\n';
-    }
+		try
+		{
+			std::cout << parser.parse(s).getProcessingResult().getValue() << '\n';
+		}
+		catch (const expr::ParseException& e)
+		{
+			std::cout << e.what() << '\n';
+		}
+	}
 
-    return 0;
+	return 0;
 }
+```
