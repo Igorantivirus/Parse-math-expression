@@ -81,7 +81,7 @@ namespace expr
 		void print() const override
 		{
 			std::cout << value;
-			outAct(next);
+			enumFunc::outAct(next);
 		}
 
 	private:
@@ -148,12 +148,12 @@ namespace expr
 
 		void print() const override
 		{
-			outFunc(type);
+			enumFunc::outFunc(type);
 			std::cout << '(';
 			if (arg != nullptr)
 				arg->print();
 			std::cout << ')';
-			outAct(next);
+			enumFunc::outAct(next);
 		}
 
 	private:
@@ -194,11 +194,11 @@ namespace expr
 			case FunctionType::arcctg:
 				return FType(PI_val / 2) - std::atan(v);
 			case FunctionType::fact:
-				return myFactorial(v);
+				return myMath::factorial(v);
 			case FunctionType::degrees:
-				return toRadian(v);
+				return myMath::toRadian(v);
 			case FunctionType::radian:
-				return toDegrees(v);
+				return myMath::toDegrees(v);
 			default:
 				return 0;
 			}
@@ -249,9 +249,9 @@ namespace expr
 			thirdProcessed(vls);
 
 			if (brk == Brackets::round)
-				vls[0].setValue(myFloor(vls[0].getValue()));
+				vls[0].setValue(myMath::floor(vls[0].getValue()));
 			if (brk == Brackets::frac)
-				vls[0].setValue(myFrac(vls[0].getValue()));
+				vls[0].setValue(myMath::frac(vls[0].getValue()));
 			if (brk == Brackets::modul)
 				vls[0].setValue(std::abs(vls[0].getValue()));
 			vls[0].setNextAction(next);
@@ -280,11 +280,11 @@ namespace expr
 
 		void print() const override
 		{
-			outOpenBrack(brk);
+			enumFunc::outOpenBrack(brk);
 			for (const auto& i : values)
 				i->print();
-			outCloseBrack(brk);
-			outAct(next);
+			enumFunc::outCloseBrack(brk);
+			enumFunc::outAct(next);
 		}
 
 	private:
@@ -302,7 +302,7 @@ namespace expr
 			Value pr;
 			for (size_t i = 0; i < vls.size() - 1; ++i)
 			{
-				if (firstAction(vls[i].getNextAction()))
+				if (enumFunc::firstAction(vls[i].getNextAction()))
 				{
 					if (vls[i].getNextAction() == Action::pow)
 						pr.setValue(std::pow(vls[i].getValue(), vls[i + 1].getValue()));
@@ -322,16 +322,16 @@ namespace expr
 			Value pr;
 			for (size_t i = 0; i < vls.size() - 1; ++i)
 			{
-				if (secondAction(vls[i].getNextAction()))
+				if (enumFunc::secondAction(vls[i].getNextAction()))
 				{
 					if (vls[i].getNextAction() == Action::mult)
 						pr.setValue(vls[i].getValue() * vls[i + 1].getValue());
 					else if (vls[i].getNextAction() == Action::div)
 						pr.setValue(vls[i].getValue() / vls[i + 1].getValue());
 					else if (vls[i].getNextAction() == Action::rdiv)
-						pr.setValue(myFmod(vls[i].getValue(), vls[i + 1].getValue()));
+						pr.setValue(myMath::fmod(vls[i].getValue(), vls[i + 1].getValue()));
 					else if (vls[i].getNextAction() == Action::idiv)
-						pr.setValue(myFloor(vls[i].getValue() / vls[i + 1].getValue()));
+						pr.setValue(myMath::floor(vls[i].getValue() / vls[i + 1].getValue()));
 
 					pr.setNextAction(vls[i + 1].getNextAction());
 					vls[i] = pr;
@@ -345,7 +345,7 @@ namespace expr
 			Value pr;
 			for (size_t i = 0; i < vls.size() - 1; ++i)
 			{
-				if (thirdAction(vls[i].getNextAction()))
+				if (enumFunc::thirdAction(vls[i].getNextAction()))
 				{
 					if (vls[i].getNextAction() == Action::plus)
 						pr.setValue(vls[i].getValue() + vls[i + 1].getValue());

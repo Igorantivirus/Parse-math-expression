@@ -39,20 +39,20 @@ namespace expr
 			throw ParseException("Unknown error: ", ParseException::ErrorType::none);
 		}
 
-	private:
+	private://str processing
 
 		void strParse(std::string str, Expression& res)
 		{
-			if (Brackets brk = parseBracket(str[0]); brk != Brackets::none && str.size() > 2)
+			if (Brackets brk = enumFunc::parseBracket(str[0]); brk != Brackets::none)
 			{
+				if (str.size() < 3)
+					throw ParseException("Empty brackets.", ParseException::ErrorType::brackets);
 				res.setBrackets(brk);
 				str.pop_back();
 				str.erase(str.begin());
 			}
-
 			std::vector<std::string> tkns;
 			tokenize(str, tkns);
-
 			fillExpression(tkns, res);
 		}
 
@@ -60,29 +60,18 @@ namespace expr
 		{
 			for (size_t i = 0; i < tkns.size(); ++i)
 			{
-				if (isNum(tkns[i]))
+				if (enumFunc::isNum(tkns[i]))
 				{
-					Value prv = toFType(tkns[i]);
-					fillAction(expr, prv, tkns, i);
+					Value prv = myMath::toFType(tkns[i]);
+					fillAction(tkns, i, expr, prv);
 				}
-				else if (isWord(tkns[i]))
-				{
-					if (fillSpecialWords(tkns, i, expr))
-						continue;
-					if(!checkFuncArgumen(tkns, i))
-						throw ParseException("Bad argument for function \"" + tkns[i] + '\"', ParseException::ErrorType::func);
-					Function prf;
-					prf.setType(parseFunction(tkns[i++]));
-					Expression pre;
-					strParse(tkns[i], pre);
-					prf.setArg(pre);
-					fillAction(expr, prf, tkns, i);
-				}
-				else if (parseBracket(tkns[i][0]) != Brackets::none)
+				else if (enumFunc::isWord(tkns[i]))
+					fillByWord(tkns, i, expr);
+				else if (enumFunc::parseBracket(tkns[i][0]) != Brackets::none)
 				{
 					Expression pre;
 					strParse(tkns[i], pre);
-					fillAction(expr, pre, tkns, i);
+					fillAction(tkns, i, expr, pre);
 				}
 				else if (tkns[i][0] == '-')
 				{
@@ -90,42 +79,34 @@ namespace expr
 					prv.setNextAction(Action::mult);
 					expr.add(prv);
 				}
-				else if (parseAction(tkns[i]) == Action::none)
+				else if (enumFunc::parseAction(tkns[i]) == Action::none)
 					throw ParseException("Unknown word: \"" + tkns[i] + "\"", ParseException::ErrorType::word);
 			}
 		}
 
-		void fillAction(Expression& res, ExpressionBase& value, const std::vector<std::string>& tkns, size_t& i)
+	private://sub fill strs
+
+		void fillByWord(const std::vector<std::string>& tkns, size_t& i, Expression& expr)
 		{
-			if (i + 1 != tkns.size())
+			if (fillSpecialWords(tkns, i, expr))
+				return;
+			Function prf;
+			prf.setType(enumFunc::parseFunction(tkns[i++]));
+			if (prf.getType() == FunctionType::none)
+				throw ParseException("Outside unknown word \"" + tkns[i - 1] + '\"', ParseException::ErrorType::func);
+			if (i == tkns.size())
+				throw ParseException("Outside argument for function \"" + tkns[i - 1] + '\"', ParseException::ErrorType::func);
+			if (enumFunc::isNum(tkns[i]))
+				prf.setArg(Value(myMath::toFType(tkns[i])));
+			else if (enumFunc::isOpenBracket(tkns[i][0]))
 			{
-				if (specialFunc(tkns[i + 1][0]))
-				{
-					Function prf;
-					prf.setType(parseSpecialType(tkns[i + 1][0]));
-					prf.setArg(value);
-					i++;
-					if (i + 1 != tkns.size())
-					{
-						Action act = act = parseAction(tkns[i + 1]);
-						if (act == Action::none)
-							prf.setNextAction(Action::mult);
-						else
-							prf.setNextAction((i++, act));
-					}
-					res.add(prf);
-					return;
-				}
-				else
-				{
-					Action act = act = parseAction(tkns[i + 1]);
-					if (act == Action::none)
-						value.setNextAction(Action::mult);
-					else
-						value.setNextAction((i++, act));
-				}
+				Expression pre;
+				strParse(tkns[i], pre);
+				prf.setArg(pre);
 			}
-			res.add(value);
+			else
+				throw ParseException("Bad function argument: \"" + tkns[i] + '\"', ParseException::ErrorType::func);
+			fillAction(tkns, i, expr, prf);
 		}
 
 		bool fillSpecialWords(const std::vector<std::string>& tkns, size_t& i, Expression& expr)
@@ -135,22 +116,55 @@ namespace expr
 				Expression pre1, pre2;
 				if (i + 2 >= tkns.size())
 					throw ParseException("The log function without arguments.", ParseException::ErrorType::func);
-				if (!((isNum(tkns[i + 1]) || isOpenBracket(tkns[i + 1][0])) && (isNum(tkns[i + 2]) || isOpenBracket(tkns[i + 2][0]))))
+				if (!((enumFunc::isNum(tkns[i + 1]) || enumFunc::isOpenBracket(tkns[i + 1][0])) && (enumFunc::isNum(tkns[i + 2]) || enumFunc::isOpenBracket(tkns[i + 2][0]))))
 					throw ParseException("The log argument is not a number.", ParseException::ErrorType::func);
 				strParse(tkns[++i], pre1);
 				strParse(tkns[++i], pre2);
 				pre1.setNextAction(Action::log);
 				expr.add(pre1);
-				fillAction(expr, pre2, tkns, i);
+				fillAction(tkns, i, expr, pre2);
 				return true;
 			}
 			else if (tkns[i] == "inf")
 			{
 				Value prv = FType(1.l / std::sin(0.l));
-				fillAction(expr, prv, tkns, i);
+				fillAction(tkns, i, expr, prv);
 				return true;
 			}
 			return false;
+		}
+
+		void fillAction(const std::vector<std::string>& tkns, size_t& i, Expression& expr, ExpressionBase& value)
+		{
+			if (i + 1 != tkns.size())
+			{
+				if (enumFunc::specialFunc(tkns[i + 1][0]))
+				{
+					Function prf;
+					prf.setType(enumFunc::parseSpecialType(tkns[i + 1][0]));
+					prf.setArg(value);
+					i++;
+					if (i + 1 != tkns.size())
+					{
+						Action act = act = enumFunc::parseAction(tkns[i + 1]);
+						if (act == Action::none)
+							prf.setNextAction(Action::mult);
+						else
+							prf.setNextAction((i++, act));
+					}
+					expr.add(prf);
+					return;
+				}
+				else
+				{
+					Action act = act = enumFunc::parseAction(tkns[i + 1]);
+					if (act == Action::none)
+						value.setNextAction(Action::mult);
+					else
+						value.setNextAction((i++, act));
+				}
+			}
+			expr.add(value);
 		}
 
 	private://str edit
@@ -162,7 +176,7 @@ namespace expr
 			size_t pos;
 			while ((pos = str.find('|')) != std::string::npos)
 			{
-				if (!(str[pos - 1] >= '0' && str[pos - 1] <= '9') && !isCloseBracket(str[pos - 1]) && str[pos - 1] != 'i' && str[pos - 1] != '|' && !specialFunc(str[pos - 1]))
+				if (!(str[pos - 1] >= '0' && str[pos - 1] <= '9') && !enumFunc::isCloseBracket(str[pos - 1]) && str[pos - 1] != 'i' && str[pos - 1] != '|' && !enumFunc::specialFunc(str[pos - 1]))
 					str[pos] = '<';
 				else
 					str[pos] = '>';
@@ -196,14 +210,14 @@ namespace expr
 				tokens[0] = "1i";
 			for (size_t i = tokens.size() - 1; i > 0; --i)
 			{
-				if ((isOpenBracket(tokens[i][0]) || isCloseBracket(tokens[i].back())) && !goodBrackets(tokens[i]))
+				if ((enumFunc::isOpenBracket(tokens[i][0]) || enumFunc::isCloseBracket(tokens[i].back())) && !goodBrackets(tokens[i]))
 				{
 					tokens[i - 1] += tokens[i];
 					tokens.erase(tokens.begin() + i);
 				}
-				else if (tokens[i] == "i")
+				else if (tokens[i].size() == 1 && tokens[i][0] == 'i')
 				{
-					if (isNum(tokens[i - 1]))
+					if (enumFunc::isNum(tokens[i - 1]))
 					{
 						tokens[i - 1].push_back('i');
 						tokens.erase(tokens.begin() + i);
@@ -214,153 +228,19 @@ namespace expr
 			}
 		}
 
-	private://enum parse
-
-		Action parseAction(const std::string& s)
-		{
-			switch (s[0])
-			{
-			case '+':
-				return Action::plus;
-			case '-':
-				return Action::minus;
-			case '*':
-				return Action::mult;
-			case '%':
-				return Action::rdiv;
-			case '^':
-				return Action::pow;
-			default:
-				if (s == "//")
-					return Action::idiv;
-				if (s == "/")
-					return Action::div;
-				if (s == "nrt")
-					return Action::nrt;
-				return Action::none;
-			}
-		}
-		Brackets parseBracket(const char c)
-		{
-			switch (c)
-			{
-			case '(':
-			case ')':
-				return Brackets::def;
-			case '[':
-			case ']':
-				return Brackets::round;
-			case '{':
-			case '}':
-				return Brackets::frac;
-			case '<':
-			case '>':
-				return Brackets::modul;
-			default:
-				return Brackets::none;
-			}
-		}
-		FunctionType parseFunction(const std::string& s)
-		{
-			if (s == "sqrt")
-				return FunctionType::sqrt;
-			if (s == "ln")
-				return FunctionType::ln;
-			if (s == "lg")
-				return FunctionType::lg;
-			if (s == "sin")
-				return FunctionType::sin;
-			if (s == "cos")
-				return FunctionType::cos;
-			if (s == "tg")
-				return FunctionType::tg;
-			if (s == "ctg")
-				return FunctionType::ctg;
-			if (s == "arcsin")
-				return FunctionType::arcsin;
-			if (s == "arccos")
-				return FunctionType::arccos;
-			if (s == "arctg")
-				return FunctionType::arctg;
-			if (s == "arcctg")
-				return FunctionType::arcctg;
-			if (s == "fact")
-				return FunctionType::fact;
-			if (s == "d")
-				return FunctionType::degrees;
-			throw ParseException("Unknown word: \"" + s + "\".", ParseException::ErrorType::word);
-		}
-		FunctionType parseSpecialType(const char c)
-		{
-			if (c == '!')
-				return FunctionType::fact;
-			if (c == 'd')
-				return FunctionType::degrees;
-			if (c == 'r')
-				return FunctionType::radian;
-			return FunctionType::none;
-		}
-
-	private://special func
-
-		bool specialFunc(const char c)
-		{
-			return c == 'd' || c == '!' || c == 'r';
-		}
-		bool isOpenBracket(const char c)
-		{
-			return c == '(' || c == '{' || c == '[' || c == '<';
-		}
-		bool isCloseBracket(const char c)
-		{
-			return c == ')' || c == '}' || c == ']' || c == '>';
-		}
-		bool isNum(const std::string& str)
-		{
-			return str[0] >= '0' && str[0] <= '9';
-		}
-		bool isWord(const std::string& str)
-		{
-			return str[0] >= 'a' && str[0] <= 'z' || str[0] >= 'A' && str[0] <= 'Z';
-		}
-		char oppositeBracket(const char c)
-		{
-			switch (c)
-			{
-			case '(': return ')';
-			case ')': return '(';
-			case '[': return ']';
-			case ']': return '[';
-			case '{': return '}';
-			case '}': return '{';
-			case '<': return '>';
-			case '>': return '<';
-			default: return '\0';
-			}
-		}
-
-	private://chech errors
-
 		bool goodBrackets(const std::string& str)
 		{
 			std::stack<char> s;
 			for (const auto& i : str)
-				if (isOpenBracket(i))
+				if (enumFunc::isOpenBracket(i))
 					s.push(i);
-				else if (isCloseBracket(i))
+				else if (enumFunc::isCloseBracket(i))
 				{
-					if (s.empty() || s.top() != oppositeBracket(i))
+					if (s.empty() || s.top() != enumFunc::oppositeBracket(i))
 						return false;
 					s.pop();
 				}
 			return s.empty();
-		}
-
-		bool checkFuncArgumen(const std::vector<std::string>& tkns, const size_t i)
-		{
-			if (i + 1 == tkns.size() || !isNum(tkns[i + 1]) || !isOpenBracket(tkns[i][0]))
-				return false;
-			return true;
 		}
 
 	};
