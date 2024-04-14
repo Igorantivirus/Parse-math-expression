@@ -197,13 +197,6 @@ namespace expr
 		return x - integer_part * y;
 	}
 
-	FType realToImag(FType a)
-	{
-		a.imag(a.real());
-		a.real(0);
-		return a;
-	}
-
 	FType toFType(const std::string& str)
 	{
 		auto pr = std::stold(str);
