@@ -69,13 +69,11 @@ namespace expr
 				{
 					if (fillSpecialWords(tkns, i, expr))
 						continue;
+					if(!checkFuncArgumen(tkns, i))
+						throw ParseException("Bad argument for function \"" + tkns[i] + '\"', ParseException::ErrorType::func);
 					Function prf;
 					prf.setType(parseFunction(tkns[i++]));
 					Expression pre;
-					if(i == tkns.size())
-						throw ParseException("Function \"" + tkns[i-1] + "\" without argument", ParseException::ErrorType::func);
-					if (!isOpenBracket(tkns[i][0]) || !isNum(tkns[i]))
-						throw ParseException("Bad function argument: \"" + tkns[i] + '\"', ParseException::ErrorType::func);
 					strParse(tkns[i], pre);
 					prf.setArg(pre);
 					fillAction(expr, prf, tkns, i);
@@ -341,6 +339,8 @@ namespace expr
 			}
 		}
 
+	private://chech errors
+
 		bool goodBrackets(const std::string& str)
 		{
 			std::stack<char> s;
@@ -354,6 +354,13 @@ namespace expr
 					s.pop();
 				}
 			return s.empty();
+		}
+
+		bool checkFuncArgumen(const std::vector<std::string>& tkns, const size_t i)
+		{
+			if (i + 1 == tkns.size() || !isNum(tkns[i + 1]) || !isOpenBracket(tkns[i][0]))
+				return false;
+			return true;
 		}
 
 	};

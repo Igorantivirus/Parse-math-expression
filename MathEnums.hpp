@@ -175,7 +175,6 @@ namespace expr
 	{
 		return g * FType(180.l / PI_val);
 	}
-
 	FType myFloor(FType v)
 	{
 		v.real(std::floor(v.real()));
@@ -196,7 +195,6 @@ namespace expr
 		FType integer_part(a, b);
 		return x - integer_part * y;
 	}
-
 	FType toFType(const std::string& str)
 	{
 		auto pr = std::stold(str);
@@ -204,7 +202,6 @@ namespace expr
 			return std::complex<double>(0, pr);
 		return std::complex<double>(pr, 0);
 	}
-
 	FType myFactorial(const FType& a)
 	{
 		return std::tgamma(a.real() + 1);
