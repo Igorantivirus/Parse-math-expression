@@ -212,6 +212,11 @@ namespace expr
 		return std::complex<double>(pr, 0);
 	}
 
+	FType myFactorial(const FType& a)
+	{
+		return std::tgamma(a.real() + 1);
+	}
+
 	void replaceAll(std::string& str, const char* oldS, const char* newS)
 	{
 		const size_t s1 = std::strlen(oldS);

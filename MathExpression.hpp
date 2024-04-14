@@ -194,7 +194,7 @@ namespace expr
 			case FunctionType::arcctg:
 				return FType(PI_val / 2) - std::atan(v);
 			case FunctionType::fact:
-				return std::tgamma(v.real() + 1);
+				return myFactorial(v);
 			case FunctionType::degrees:
 				return toRadian(v);
 			case FunctionType::radian:
