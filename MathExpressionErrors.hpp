@@ -12,6 +12,7 @@ namespace expr
 		{
 			none = 0,
 			brackets,
+			word,
 			func
 		};
 	public:

@@ -8,7 +8,8 @@
 
 namespace expr
 {
-	using FType = long double;;
+	//using FType = std::complex<long double>;
+	using FType = long double;
 
 	enum class Action : char
 	{
@@ -175,7 +176,7 @@ namespace expr
 		return g * FType(180.l / PI_val);
 	}
 
-	FType myFloor(FType v)
+	FType myFloor(const FType& v)
 	{
 		return std::floor(v);
 	}
@@ -191,6 +192,11 @@ namespace expr
 	FType toFType(const std::string& str)
 	{
 		return std::stold(str);
+	}
+
+	FType myFactorial(const FType& a)
+	{
+		return std::tgamma(a + 1);
 	}
 
 	void replaceAll(std::string& str, const char* oldS, const char* newS)
