@@ -4,6 +4,8 @@
 #include<iostream>
 #include<complex>
 
+#include"MathExpressionErrors.hpp"
+
 #define PI_val 3.1415926535897932l
 
 namespace expr
@@ -303,10 +305,12 @@ namespace expr
 		}
 		FType toFType(const std::string& str)
 		{
-			auto pr = std::stold(str);
+			if (str.size() > 300)
+				throw ParseException("Number overflow, maximum 300, size: " + std::to_string(str.size()), ParseException::ErrorType::overflow);
+			long double pr = std::stold(str);
 			if (str.back() == 'i')
-				return std::complex<double>(0, pr);
-			return std::complex<double>(pr, 0);
+				return std::complex<long double>(0, pr);
+			return std::complex<long double>(pr, 0);
 		}
 		FType floor(FType v)
 		{

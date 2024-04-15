@@ -13,7 +13,8 @@ namespace expr
 			none = 0,
 			brackets,
 			word,
-			func
+			func,
+			overflow
 		};
 	public:
 		ParseException(const std::string& str, ErrorType t = ErrorType::none) : msg(str), type(t) {}

@@ -14,7 +14,6 @@ namespace expr
 	public:
 
 		Expression parse(std::string str) throw(ParseException)
-		try
 		{
 			modulEdit(str);
 			if (!goodBrackets(str))
@@ -25,18 +24,6 @@ namespace expr
 			Expression res;
 			fillExpression(tkns, res);
 			return res;
-		}
-		catch (const ParseException& e)
-		{
-			throw ParseException(e.what(), e.getType());
-		}
-		catch (const std::exception& e)
-		{
-			throw ParseException(std::string("Unknown error: ") + e.what(), ParseException::ErrorType::none);
-		}
-		catch (...)
-		{
-			throw ParseException("Unknown error: ", ParseException::ErrorType::none);
 		}
 
 	private://str processing
