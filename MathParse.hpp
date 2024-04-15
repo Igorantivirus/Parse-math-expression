@@ -80,9 +80,9 @@ namespace expr
 			Function prf;
 			prf.setType(enumFunc::parseFunction(tkns[i++]));
 			if (prf.getType() == FunctionType::none)
-				throw ParseException("Outside unknown word \"" + tkns[i - 1] + '\"', ParseException::ErrorType::func);
+				throw ParseException("Encountered unknown word \"" + tkns[i - 1] + '\"', ParseException::ErrorType::func);
 			if (i == tkns.size())
-				throw ParseException("Outside argument for function \"" + tkns[i - 1] + '\"', ParseException::ErrorType::func);
+				throw ParseException("Missing argument for function \"" + tkns[i - 1] + '\"', ParseException::ErrorType::func);
 			if (enumFunc::isNum(tkns[i]))
 				prf.setArg(Value(myMath::toFType(tkns[i])));
 			else if (enumFunc::isOpenBracket(tkns[i][0]))
@@ -102,9 +102,9 @@ namespace expr
 			{
 				Expression pre1, pre2;
 				if (i + 2 >= tkns.size())
-					throw ParseException("The log function without arguments.", ParseException::ErrorType::func);
+					throw ParseException("The \"log\" function without arguments.", ParseException::ErrorType::func);
 				if (!((enumFunc::isNum(tkns[i + 1]) || enumFunc::isOpenBracket(tkns[i + 1][0])) && (enumFunc::isNum(tkns[i + 2]) || enumFunc::isOpenBracket(tkns[i + 2][0]))))
-					throw ParseException("The log argument is not a number.", ParseException::ErrorType::func);
+					throw ParseException("The \"log\" argument is not a number.", ParseException::ErrorType::func);
 				strParse(tkns[++i], pre1);
 				strParse(tkns[++i], pre2);
 				pre1.setNextAction(Action::log);
