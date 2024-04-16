@@ -19,7 +19,7 @@ namespace expr
 	public:
 		ParseException(const std::string& str, ErrorType t = ErrorType::none) : msg(str), type(t) {}
 
-		char const* what() const override noexcept
+		char const* what() const noexcept override
 		{
 			return msg.c_str();
 		}
