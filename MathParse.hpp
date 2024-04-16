@@ -13,7 +13,7 @@ namespace expr
 	{
 	public:
 
-		Expression parse(std::string str) throw(ParseException)
+		Expression parse(std::string str)
 		{
 			modulEdit(str);
 			if (!goodBrackets(str))
