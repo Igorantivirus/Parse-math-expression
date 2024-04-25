@@ -196,9 +196,9 @@ namespace expr
 			case FunctionType::fact:
 				return myMath::factorial(v);
 			case FunctionType::degrees:
-				return myMath::toRadian(v);
-			case FunctionType::radian:
 				return myMath::toDegrees(v);
+			case FunctionType::radian:
+				return myMath::toRadian(v);
 			default:
 				return 0;
 			}
@@ -307,7 +307,7 @@ namespace expr
 					if (vls[i].getNextAction() == Action::pow)
 						pr.setValue(std::pow(vls[i].getValue(), vls[i + 1].getValue()));
 					else if (vls[i].getNextAction() == Action::nrt)
-						pr.setValue(std::pow(vls[i + 1].getValue(), FType(1) / vls[i].getValue()));
+						pr.setValue(myMath::nrt(vls[i + 1].getValue(), vls[i].getValue()));
 					else if (vls[i].getNextAction() == Action::log)
 						pr.setValue(std::log(vls[i + 1].getValue()) / std::log(vls[i].getValue()));
 					pr.setNextAction(vls[i + 1].getNextAction());

@@ -3,6 +3,7 @@
 #include<string>
 #include<iostream>
 #include<complex>
+#include<math.h>
 
 #include"MathExpressionErrors.hpp"
 
@@ -322,7 +323,7 @@ namespace expr
 		{
 			return v - floor(v);
 		}
-		FType fmod(FType x, FType y)
+		FType fmod(const FType& x, const FType& y)
 		{
 			FType quotient = x / y;
 			auto a = quotient.real();
@@ -330,12 +331,46 @@ namespace expr
 			std::modf(a, &a);
 			std::modf(b, &b);
 			FType integer_part(a, b);
-			return x - integer_part * y;
+			FType res =  x - integer_part * y;
+			res.imag(std::abs(res.imag()));
+			res.real(std::abs(res.real()));
+			return res;
 		}
-		FType factorial(const FType& a)
-	{
-		return std::tgamma(a.real() + 1);
-	}
+		FType factorial(const FType& z, const size_t k = 10000)
+		{
+			const long double a = z.real();
+			const long double b = z.imag();
+
+			if (b == 0.l && a >= 0.l)
+				return std::complex<long double>(std::tgamma(a + 1));
+
+			long double s1 = 0.l;
+			long double s2 = 0.l;
+
+			for (std::size_t n = 1; n <= k; ++n)
+			{
+				s1 += log(n) + a * log(1.l + 1.l / n) - 0.5l * log((n + a) * (n + a) + b * b);
+				s2 += b * log(1.l + 1.l / n) - 2 * atan(b / (n + a + sqrt((n + a) * (n + a) + b * b)));
+			}
+
+			s1 = std::exp(s1);
+
+			std::complex<long double> res;
+
+			long double c = s1 * cos(s2);
+			long double d = s1 * sin(s2);
+
+			res.real(c);
+			res.imag(d);
+
+			return res;
+		}
+		FType nrt(const FType& a, const FType& step)
+		{
+			if (a.imag() == 0.l && a.real() < 0 && step.imag() == 0.l && std::fmod(step.real(), 2) == 1)
+				return -std::pow(-a.real(), 1.l / step.real());
+			return std::pow(a, 1.l / step);
+		}
 	}
 
 	void replaceAll(std::string& str, const char* oldS, const char* newS)
