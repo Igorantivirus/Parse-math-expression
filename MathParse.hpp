@@ -188,29 +188,20 @@ namespace expr
 				{
 					if (!match[j].str().empty())
 					{
-						tokens.push_back(match[j].str());
+						if(match[j].str()[0] == 'i' || match[j].str() == "nan")
+							tokens.push_back('1' + match[j].str());
+						else
+							tokens.push_back(match[j].str());
 						break;
 					}
 				}
 			}
-			if (tokens[0][0] == 'i')
-				tokens[0] = "1i";
 			for (size_t i = tokens.size() - 1; i > 0; --i)
 			{
 				if ((enumFunc::isOpenBracket(tokens[i][0]) || enumFunc::isCloseBracket(tokens[i].back())) && !goodBrackets(tokens[i]))
 				{
 					tokens[i - 1] += tokens[i];
 					tokens.erase(tokens.begin() + i);
-				}
-				else if (tokens[i].size() == 1 && tokens[i][0] == 'i')
-				{
-					if (enumFunc::isNum(tokens[i - 1]))
-					{
-						tokens[i - 1].push_back('i');
-						tokens.erase(tokens.begin() + i);
-					}
-					else
-						tokens[i] = "1i";
 				}
 			}
 		}

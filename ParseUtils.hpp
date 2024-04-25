@@ -296,6 +296,15 @@ namespace expr
 
 	namespace myMath
 	{
+		FType getNAN()
+		{
+			return FType(std::nanl(""), std::nanl(""));
+		}
+		FType getINF()
+		{
+			return FType(1.l / std::sin(0), 0.l);
+		}
+
 		FType toRadian(const FType& g)
 		{
 			return g * FType(PI_val / 180.l);
@@ -309,8 +318,16 @@ namespace expr
 			if (str.size() > 300)
 				throw ParseException("Number overflow, maximum 300, size: " + std::to_string(str.size()), ParseException::ErrorType::overflow);
 			long double pr = std::stold(str);
-			if (str.back() == 'i')
-				return std::complex<long double>(0, pr);
+
+			if (str.back() > '9' || str.back() < '0')
+			{
+				if(str.back() == 'i')
+					return std::complex<long double>(0, pr);
+				else if (str.find("inf") != std::string::npos)
+					return getINF();
+				else
+					return getNAN();
+			}
 			return std::complex<long double>(pr, 0);
 		}
 		FType floor(FType v)
@@ -369,7 +386,7 @@ namespace expr
 		{
 			if (a.imag() == 0.l && a.real() < 0 && step.imag() == 0.l && std::fmod(step.real(), 2) == 1)
 				return -std::pow(-a.real(), 1.l / step.real());
-			return std::pow(a, 1.l / step);
+			return std::pow(a, FType(1.l) / step);
 		}
 	}
 
