@@ -8,6 +8,8 @@
 #include"../MathWorker/MathWorker.hpp"
 #include"../FileHeaders/FileReader.hpp"
 
+#define BD_TD_FILE "bd.td"
+
 namespace expr
 {
 
@@ -179,6 +181,11 @@ namespace expr
 			readMap(path);
 		}
 
+		void reoen(const std::string& str)
+		{
+			readMap(str);
+		}
+
 		const std::string toStr(const ActionT v) const
 		{
 			for (auto const& [key, value] : _map)
@@ -272,12 +279,11 @@ namespace expr
 
 		void readMap(const std::string& path)
 		{
+			_map.clear();
+			_constants.clear();
 			TDReader file(path);
 			if (!file.isOpen())
-			{
-				std::cerr << "File \"" << path << "\" is not found" << '\n';
 				return;
-			}
 			std::vector<std::string> prArr;
 			while ((prArr = file.readLine()).size() == 3)
 			{
@@ -295,7 +301,7 @@ namespace expr
 
 	};
 
-	MathConverter mconverter("FileHeaders/bd.td");
+	MathConverter mconverter(BD_TD_FILE);
 
 	void replaceAll(std::string& str, const std::string& oldS, const std::string& newS) 
 	{
