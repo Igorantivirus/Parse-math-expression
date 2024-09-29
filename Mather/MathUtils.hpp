@@ -273,6 +273,11 @@ namespace expr
 		void readMap(const std::string& path)
 		{
 			TDReader file(path);
+			if (!file.isOpen())
+			{
+				std::cerr << "File \"" << path << "\" is not found" << '\n';
+				return;
+			}
 			std::vector<std::string> prArr;
 			while ((prArr = file.readLine()).size() == 3)
 			{
