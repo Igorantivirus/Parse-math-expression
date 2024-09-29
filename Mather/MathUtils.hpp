@@ -181,7 +181,7 @@ namespace expr
 			readMap(path);
 		}
 
-		void reoen(const std::string& str)
+		void reopen(const std::string& str)
 		{
 			readMap(str);
 		}
@@ -283,7 +283,10 @@ namespace expr
 			_constants.clear();
 			TDReader file(path);
 			if (!file.isOpen())
+			{
+				//std::cerr << "Not found \"" << path << '\"' << '\n';
 				return;
+			}
 			std::vector<std::string> prArr;
 			while ((prArr = file.readLine()).size() == 3)
 			{
