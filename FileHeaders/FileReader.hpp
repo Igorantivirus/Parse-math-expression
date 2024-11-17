@@ -2,12 +2,15 @@
 
 #include<string>
 #include<fstream>
+#include<sstream>
 #include<vector>
+
+#include"../Bd_td.hpp"
 
 class TDReader
 {
 public:
-	TDReader(const std::string& path) : _file(path) {}
+	TDReader(const std::string& path) : _file(bd_td) {}
 
 	std::vector<std::string> readLine()
 	{
@@ -22,20 +25,20 @@ public:
 
 	bool isOpen() const
 	{
-		return _file.is_open();
+		return true;
 	}
 	void close()
 	{
-		_file.close();
+		_file.clear();
 	}
 	void open(const std::string& path)
 	{
-		_file.open(path);
+		//_file.read();
 	}
 
 private:
 
-	std::ifstream _file;
+	std::istringstream _file;
 
 private:
 
