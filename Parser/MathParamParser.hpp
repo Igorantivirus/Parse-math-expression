@@ -23,6 +23,16 @@ namespace expr
 
 				return Value<Complex>::convertProcessed(parser.parse(str));
 			}
+			Expression<Complex> parseToExpression(std::string str)
+			{
+				preproc(str);
+				std::map<std::string, std::string> variabels;
+				fillVariables(variabels, str);
+				solveVariables(variabels);
+				insertVariables(variabels, str);
+
+				return parser.parse(str);
+			}
 
 			const std::string parseNoExcept(std::string str) const noexcept
 			{
