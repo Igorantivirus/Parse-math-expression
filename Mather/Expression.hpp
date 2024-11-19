@@ -61,14 +61,9 @@ namespace expr
 						res += '}';
 					++i;
 				}
-				else if (_expression[i]->getAct() == ActionT::pow)
+				else if (i - 1 < _expression.size() && _expression[i - 1]->getAct() == ActionT::pow)
 				{
-					res += _expression[i]->toMathJaxStr() + "^{";
-					if (i + 1 < _expression.size())
-						res += _expression[i + 1]->toMathJaxStr() + '}' + mconverter.toStr(_expression[i + 1]->getAct());
-					else
-						res += '}';
-					++i;
+					res += '{' + _expression[i]->toMathJaxStr() + '}' + mconverter.toStr(_expression[i]->getAct());
 				}
 				else
 				{
