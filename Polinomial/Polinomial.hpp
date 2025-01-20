@@ -137,10 +137,10 @@ namespace expr
 				_expression.clear();
 				return *this;
 			}
-			for (auto& j : other._expression)
+			for (const Monomial<Complex>& j : other._expression)
 			{
 				bool was = false;
-				for (auto& i : _expression)
+				for (Monomial<Complex>& i : _expression)
 					if (i -= j)
 					{
 						was = true;
@@ -227,7 +227,7 @@ namespace expr
 			_exception = other._expression;
 			return *this;
 		}
-		Polinomial& operator=(Polinomial&& other)
+		Polinomial& operator=(Polinomial&& other) noexcept
 		{
 			_expression = std::move(other._expression);
 			return *this;

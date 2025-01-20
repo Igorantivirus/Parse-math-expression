@@ -54,7 +54,7 @@ namespace expr
 		}
 		bool operator==(const Variable& other) const
 		{
-			return _var == other._var && _degr == other._degr;
+			return (_var == other._var) && (_degr == other._degr);
 		}
 		bool operator!=(const Variable& other) const
 		{

@@ -179,7 +179,7 @@ namespace expr
 			if (_coefs.size() != other._coefs.size())
 				return false;
 			for (size_t i = 0; i < _coefs.size(); ++i)
-				if (_coefs[i].getVar() != other._coefs[i].getVar() || _coefs[i].getDegr() != other._coefs[i].getDegr())
+				if (_coefs[i] != other._coefs[i])
 					return false;
 			_num += other._num;
 			return true;
@@ -195,7 +195,7 @@ namespace expr
 			if (_coefs.size() != other._coefs.size())
 				return false;
 			for (size_t i = 0; i < _coefs.size(); ++i)
-				if (_coefs[i].getVar() != other._coefs[i].getVar())
+				if (_coefs[i] != other._coefs[i])
 					return false;
 			_num -= other._num;
 			return true;

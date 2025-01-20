@@ -22,6 +22,7 @@ namespace expr
 
 				PolinomExpression expr;
 				fillPolinom(tokens, expr);
+
 				return procession(expr);
 			}
 
@@ -86,6 +87,12 @@ namespace expr
 					{
 						Polinomial<Complex> pr = Monomial<Complex>(1, c);
 						expr.push_back({ pr, getNextAction(tkns, i) });
+						continue;
+					}
+					if (c == '-')
+					{
+						Polinomial<Complex> pr(Monomial(Complex(-1)));
+						expr.push_back({ pr, ActionT::multiply });
 						continue;
 					}
 					throw ParseException("Unknown Token: \"" + tkns[i] + '\"');
