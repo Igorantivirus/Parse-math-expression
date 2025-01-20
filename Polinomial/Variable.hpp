@@ -7,6 +7,7 @@
 
 namespace expr
 {
+	template<typename Complex>
 	class Variable
 	{
 	public:

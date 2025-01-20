@@ -10,13 +10,13 @@
 
 namespace expr
 {
-
+	template<typename Complex>
 	class Polinomial
 	{
 	public:
 		Polinomial() = default;
-		Polinomial(const Monomial& mono) :
-			_expression(std::vector<Monomial>(1, mono))
+		Polinomial(const Monomial<Complex>& mono) :
+			_expression(std::vector<Monomial<Complex>>(1, mono))
 		{}
 
 		#pragma region Methods
@@ -48,7 +48,6 @@ namespace expr
 		{
 			std::string res;
 			for (const auto& i : _expression)
-				//res += (i.getNum() >= NumT(0) ? "+" : "") + i.toString();
 				res += '+' + i.toString();
 			return res;
 		}
@@ -67,7 +66,7 @@ namespace expr
 			return _expression.empty();
 		}
 
-		std::vector<Polinomial> groupAtVar(const Variable& var) const
+		std::vector<Polinomial> groupAtVar(const Variable<Complex>& var) const
 		{
 			std::map<frac::Fraction, Polinomial> map;
 			for (const auto& term : _expression)
@@ -181,11 +180,11 @@ namespace expr
 			return pol;
 		}
 
-		const Monomial& operator[](const size_t ind) const
+		const Monomial<Complex>& operator[](const size_t ind) const
 		{
 			return _expression[ind];
 		}
-		Monomial& operator[](const size_t ind)
+		Monomial<Complex>& operator[](const size_t ind)
 		{
 			return _expression[ind];
 		}
@@ -216,7 +215,7 @@ namespace expr
 
 	private:
 
-		std::vector<Monomial> _expression;
+		std::vector<Monomial<Complex>> _expression;
 
 	private:
 
@@ -234,23 +233,27 @@ namespace expr
 
 }
 
-expr::Polinomial operator+(const expr::Monomial& a, const expr::Monomial& b)
+template<typename Complex>
+expr::Polinomial<Complex> operator+(const expr::Monomial<Complex>& a, const expr::Monomial<Complex>& b)
 {
-	return expr::Polinomial(a) + b;
+	return expr::Polinomial<Complex>(a) + b;
 }
-expr::Polinomial operator-(const expr::Monomial& a, const expr::Monomial& b)
+template<typename Complex>
+expr::Polinomial<Complex> operator-(const expr::Monomial<Complex>& a, const expr::Monomial<Complex>& b)
 {
-	return expr::Polinomial(a) - b;
+	return expr::Polinomial<Complex>(a) - b;
 }
-expr::Polinomial operator*(const expr::Monomial& a, const expr::Monomial& b)
+template<typename Complex>
+expr::Polinomial<Complex> operator*(const expr::Monomial<Complex>& a, const expr::Monomial<Complex>& b)
 {
-	expr::Monomial pr = a;
+	expr::Monomial<Complex> pr = a;
 	pr *= b;
-	return expr::Polinomial(pr);
+	return expr::Polinomial<Complex>(pr);
 }
-expr::Polinomial operator/(const expr::Monomial& a, const expr::Monomial& b)
+template<typename Complex>
+expr::Polinomial<Complex> operator/(const expr::Monomial<Complex>& a, const expr::Monomial<Complex>& b)
 {
-	expr::Monomial pr = a;
+	expr::Monomial<Complex> pr = a;
 	pr /= b;
-	return expr::Polinomial(pr);
+	return expr::Polinomial<Complex>(pr);
 }

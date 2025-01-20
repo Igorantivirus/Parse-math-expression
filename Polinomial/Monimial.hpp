@@ -4,35 +4,37 @@
 #include<algorithm>
 #include<vector>
 
-#include"PolinomUtils.hpp"
+//#include"PolinomUtils.hpp"
 #include"Variable.hpp"
+
+#include"../MathWorker/MathWorker.hpp"
 
 namespace expr
 {
-
+	template<typename Complex>
 	class Monomial
 	{
 	public:
 
-#pragma region Constructors
+		#pragma region Constructors
 
 		Monomial() = default;
-		Monomial(const NumT& num, const std::vector<Variable>& coefs) :
+		Monomial(const Complex& num, const std::vector<Variable<Complex>>& coefs) :
 			_num(num)
 		{
 			setCoefs(coefs);
 		}
-		Monomial(const NumT& num, const char var, const frac::Fraction degr = 1) :
+		Monomial(const Complex& num, const char var, const frac::Fraction degr = 1) :
 			_num(num)
 		{
 			setCoefs(var, degr);
 		}
-		explicit Monomial(const NumT& num) :
+		explicit Monomial(const Complex& num) :
 			_num(num)
 		{}
 		template<std::integral T>
 		Monomial(T num) :
-			_num(NumT(num))
+			_num(Complex(num))
 		{}
 		explicit Monomial(const char var) :
 			_num(1)
@@ -40,40 +42,41 @@ namespace expr
 			setCoefs(var, 1LL);
 		}
 
-#pragma endregion
+		#pragma endregion
 
-#pragma region Methods
+		#pragma region Methods
 
-		const std::vector<Variable>& getCoefs() const
+		const std::vector<Variable<Complex>>& getCoefs() const
 		{
 			return _coefs;
 		}
-		const NumT& getNum() const
+		const Complex& getNum() const
 		{
 			return _num;
 		}
 
-		void setCoefs(const std::vector<Variable>& coefs)
+		void setCoefs(const std::vector<Variable<Complex>>& coefs)
 		{
 			_coefs = coefs;
 			sortCoefs();
 		}
 		void setCoefs(const char coef, const frac::Fraction& degr)
 		{
-			Variable var = { coef, degr };
+			Variable<Complex> var = { coef, degr };
 			_coefs.clear();
 			_coefs.push_back(var);
 		}
-		void setNum(const NumT& num)
+		void setNum(const Complex& num)
 		{
 			_num = num;
-			if (_num == NumT(0))
+			if (_num == Complex(0))
 				_coefs.clear();
 		}
 
 		const std::string toString() const
 		{
-			std::string res = PolinomUtils::toString(_num);
+			mathWorker::MathWorker<Complex> wrk;
+			std::string res = wrk.toStr(_num);
 			for (const auto& i : _coefs)
 				res += i.toString();
 			return res;
@@ -94,8 +97,9 @@ namespace expr
 				}
 			}
 			std::string frac = denom.empty() ? num : ("\\frac{" + (num.empty() ? "1" : num) + "}{" + denom + "}");
-
-			std::string number = PolinomUtils::toMathJaxString(_num);
+			mathWorker::MathWorker<Complex> wrk;
+			
+			std::string number = wrk.toMathJaxStr(_num);;
 			if (std::min(number.find('+'), number.find('-')) != std::string::npos)
 				return '(' + number + ')' + frac;
 
@@ -106,9 +110,9 @@ namespace expr
 			return number + frac;
 		}
 
-#pragma endregion
+		#pragma endregion
 
-#pragma region Operators
+		#pragma region Operators
 
 		Monomial& operator*=(const Monomial& other)
 		{
@@ -218,19 +222,19 @@ namespace expr
 			return !this->operator==(other);
 		}
 
-#pragma endregion
+		#pragma endregion
 
 	private:
 
-		std::vector<Variable> _coefs;
+		std::vector<Variable<Complex>> _coefs;
 
-		NumT _num = 0;
+		Complex _num = 0;
 
 	private:
 
 		void sortCoefs()
 		{
-			std::vector<Variable> pr = _coefs;
+			std::vector<Variable<Complex>> pr = _coefs;
 			_coefs.clear();
 			for (auto& i : pr)
 			{
