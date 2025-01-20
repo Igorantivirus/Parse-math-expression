@@ -24,7 +24,7 @@ namespace expr
 		{
 			setCoefs(coefs);
 		}
-		Monomial(const Complex& num, const char var, const frac::Fraction degr = 1) :
+		Monomial(const Complex& num, const char var, const Complex degr = 1) :
 			_num(num)
 		{
 			setCoefs(var, degr);
@@ -60,7 +60,7 @@ namespace expr
 			_coefs = coefs;
 			sortCoefs();
 		}
-		void setCoefs(const char coef, const frac::Fraction& degr)
+		void setCoefs(const char coef, const Complex& degr)
 		{
 			Variable<Complex> var = { coef, degr };
 			_coefs.clear();

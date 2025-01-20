@@ -3,7 +3,8 @@
 #include<string>
 #include<algorithm>
 
-#include"Fraction.hpp"
+//#include"Fraction.hpp"
+#include"../MathWorker/MathWorker.hpp"
 
 namespace expr
 {
@@ -13,13 +14,13 @@ namespace expr
 	public:
 
 		Variable() = default;
-		Variable(const char var, const frac::Fraction& degr = 1) : _var(var), _degr(degr) {}
+		Variable(const char var, const Complex& degr = 1) : _var(var), _degr(degr) {}
 
 		const char getVar() const
 		{
 			return _var;
 		}
-		const frac::Fraction& getDegr() const
+		const Complex& getDegr() const
 		{
 			return _degr;
 		}
@@ -29,7 +30,7 @@ namespace expr
 			if(var >= 'A' && var <= 'Z' || var >= 'a' && var <= 'z')
 				_var = var;
 		}
-		void setDegr(const frac::Fraction& degr)
+		void setDegr(const Complex& degr)
 		{
 			_degr = degr;
 		}
@@ -41,11 +42,10 @@ namespace expr
 		const std::string toMathJaxString() const
 		{
 			std::string res(1, _var);
-			if (_degr == 1)
+			if (_degr == Complex(1))
 				return res;
-			if (_degr.denominator() == 1)
-				return res + "^{" + PolinomUtils::toString(_degr.numerator()) + '}';
-			return "\\sqrt[" + PolinomUtils::toString(_degr.numerator()) + "]{" + res + "^" + PolinomUtils::toString(_degr.numerator()) + '}';
+			mathWorker::MathWorker<Complex> wrkr;
+			return res + "^{" + wrkr.toMathJaxStr(_degr) + '}';
 		}
 
 		bool operator<(const Variable& other) const
@@ -64,7 +64,7 @@ namespace expr
 	private:
 
 		char _var = 'x';
-		frac::Fraction _degr = 1;
+		Complex _degr = 1;
 
 	};
 }

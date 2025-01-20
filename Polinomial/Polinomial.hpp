@@ -5,7 +5,7 @@
 #include<vector>
 #include<map>
 
-#include"PolinomUtils.hpp"
+//#include"PolinomUtils.hpp"
 #include"Monimial.hpp"
 
 namespace expr
@@ -68,10 +68,10 @@ namespace expr
 
 		std::vector<Polinomial> groupAtVar(const Variable<Complex>& var) const
 		{
-			std::map<frac::Fraction, Polinomial> map;
+			std::map<Complex, Polinomial, ComplexCompare> map;
 			for (const auto& term : _expression)
 			{
-				frac::Fraction degr = 0;
+				Complex degr = 0;
 				for (const auto& coef : term.getCoefs())
 				{
 					if (coef.getVar() == var.getVar())
@@ -106,7 +106,7 @@ namespace expr
 			if (this == &other)
 			{
 				for (auto& i : _expression)
-					i.setNum(i.getNum() * NumT(2));
+					i.setNum(i.getNum() * Complex(2));
 				return *this;
 			}
 			for (auto& j : other._expression)
@@ -207,7 +207,7 @@ namespace expr
 
 		static Polinomial pow(const Polinomial& pol, unsigned int degr)
 		{
-			Polinomial res = Monomial{ NumT(1) };
+			Polinomial res = Monomial{ Complex(1) };
 			for (unsigned int i = 0; i < degr; ++i)
 				res *= pol;
 			return res;
@@ -219,16 +219,34 @@ namespace expr
 
 	private:
 
+		bool isNull(const Complex& a) const
+		{
+			return std::abs(a.real()) < 1e-10 && std::abs(a.imag()) < 1e-10;
+		}
+
 		void reduction()
 		{
 			for (size_t i = _expression.size(); i > 0; --i)
-				if (PolinomUtils::isNull(_expression[i - 1].getNum()))
+				if (isNull(_expression[i - 1].getNum()))
 					_expression.erase(_expression.begin() + i - 1);
 			for (size_t i = 0; i < _expression.size(); ++i)
 				for (size_t j = i + 1; j < _expression.size(); ++j)
 					if (_expression[i] += _expression[j])
 						_expression.erase(_expression.begin() + j--);
 		}
+
+	private:
+
+		struct ComplexCompare
+		{
+			bool operator()(const Complex& lhs, const Complex& rhs) const
+			{
+				if (lhs.real() != rhs.real())
+					return lhs.real() < rhs.real();
+				return lhs.imag() < rhs.imag();
+			}
+		};
+
 	};
 
 }
