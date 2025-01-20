@@ -127,6 +127,36 @@ namespace expr
 				}
 			}
 
+			void tokinizerPolinom(const std::string& expression, std::vector<std::string>& tokens) const
+			{
+				tokens.clear();
+				std::regex pattern("([a-zA-Z]|\\d+(\\.\\d+)?|\\(|\\)|[^a-zA-Z0-9()])");
+				std::sregex_iterator words_begin = std::sregex_iterator(expression.begin(), expression.end(), pattern);
+				std::sregex_iterator words_end = std::sregex_iterator();
+				for (std::sregex_iterator i = words_begin; i != words_end; ++i)
+				{
+					std::smatch match = *i;
+					for (size_t j = 1; j < match.size(); ++j)
+					{
+						if (!match[j].str().empty())
+						{
+							tokens.push_back(match[j].str());
+							break;
+						}
+					}
+				}
+				Preprocessor<Complex> proc;
+				for (size_t i = tokens.size() - 1; i > 0; --i)
+				{
+					if ((parseFuncs::isOpenBracket(tokens[i][0]) || parseFuncs::isCloseBracket(tokens[i].back())) &&
+						!proc.isGoodBrackets(tokens[i]))
+					{
+						tokens[i - 1] += tokens[i];
+						tokens.erase(tokens.begin() + i);
+					}
+				}
+			}
+
 			void tokenizerEquation(const std::string& expression, std::vector<std::string>& tokens) const
 			{
 				tokens.clear();
@@ -144,6 +174,7 @@ namespace expr
 				}
 				tokens.push_back(expression.substr(last));
 			}
+
 		};
 
 	}
