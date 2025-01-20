@@ -5,7 +5,7 @@
 #include<vector>
 #include<map>
 
-//#include"PolinomUtils.hpp"
+#include"../Mather/MathUtils.hpp"
 #include"Monimial.hpp"
 
 namespace expr
