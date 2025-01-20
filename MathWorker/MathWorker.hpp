@@ -2,6 +2,7 @@
 
 #include<string>
 #include<complex>
+#include<numeric>
 #include<math.h>
 
 namespace mathWorker
@@ -41,6 +42,18 @@ namespace mathWorker
 			else if(real == "0")
 				return imag + 'i';
 			if(a.imag() > 0)
+				return real + '+' + imag + 'i';
+			return real + imag + 'i';
+		}
+		std::string toMathJaxStr(const Complex& a) const
+		{
+			std::string real = toMathJaxStr(a.real());
+			std::string imag = toMathJaxStr(a.imag());
+			if (imag == "0")
+				return real;
+			else if (real == "0")
+				return imag + 'i';
+			if (a.imag() > 0)
 				return real + '+' + imag + 'i';
 			return real + imag + 'i';
 		}
@@ -199,12 +212,16 @@ namespace mathWorker
 
 	private:
 
+		using RealType = decltype(Complex().real());
+
+	private:
+
 		bool isR(const Complex& a) const
 		{
 			return a.imag() == 0.l;	
 		}
 
-		decltype(Complex().real()) noExceptStold(const std::string& str) const
+		RealType noExceptStold(const std::string& str) const
 		{
 			if(str.empty())
 				return getNan().real();
@@ -220,7 +237,7 @@ namespace mathWorker
 				}
 		}
 	
-		std::string toStr(const decltype(Complex().real()) a) const
+		std::string toStr(const RealType a) const
 		{
 			std::string res = std::to_string(a);
 			if (res.find('.') != std::string::npos)
@@ -231,6 +248,52 @@ namespace mathWorker
 					res.pop_back();
 			}
 			return res == "-0" ? "0" : res;
+		}
+
+		// Функция для проверки, насколько a близко к рациональному числу p/q
+		bool isApproxRational(const RealType a, long long& p, long long& q, const unsigned maxDenominator = 10000, const long double epsilon = 1e-9) const
+		{
+			long long p0 = 0, p1 = 1; // Числители
+			long long q0 = 1, q1 = 0; // Знаменатели
+
+			long long integerPart = 0;
+			p = 1;
+			q = 1;
+
+			long double val = std::abs(a);
+			long double fraction = val;
+			while (true)
+			{
+				integerPart = static_cast<long long>(fraction);
+				p = integerPart * p1 + p0;
+				q = integerPart * q1 + q0;
+
+				if (q > maxDenominator)
+					break; // Знаменатель превышает лимит
+
+				p0 = p1; p1 = p;
+				q0 = q1; q1 = q;
+
+				if (std::abs(val - static_cast<long double>(p) / q) < epsilon)
+				{
+					long long gcd = std::gcd(p, q);
+					p /= gcd;
+					q /= gcd;
+					p *= a < 0 ? -1 : 1;
+					return true; // Число близко к рациональному
+				}
+
+				fraction = 1 / (fraction - integerPart);
+			}
+			return false; // Число далеко от рациональных в заданных ограничениях
+		}
+
+		std::string toMathJaxStr(const RealType a) const
+		{
+			long long p{}, q{};
+			if (!isApproxRational(a, p, q) || q == 1)
+				return toStr(a);
+			return "\\frac{" + std::to_string(p) + "}{" + std::to_string(q) + "}";
 		}
 
 	};

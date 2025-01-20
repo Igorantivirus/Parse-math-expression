@@ -13,6 +13,9 @@ namespace expr
 	class Monomial
 	{
 	public:
+
+#pragma region Constructors
+
 		Monomial() = default;
 		Monomial(const NumT& num, const std::vector<Variable>& coefs) :
 			_num(num)
@@ -36,6 +39,8 @@ namespace expr
 		{
 			setCoefs(var, 1LL);
 		}
+
+#pragma endregion
 
 #pragma region Methods
 
