@@ -8,244 +8,249 @@
 #include"PolinomUtils.hpp"
 #include"Monimial.hpp"
 
-class Polinomial
+namespace expr
 {
-public:
-	Polinomial() = default;
-	Polinomial(const Monomial& mono) :
-		_expression(std::vector<Monomial>(1, mono))
-	{}
 
-	#pragma region Methods
+	class Polinomial
+	{
+	public:
+		Polinomial() = default;
+		Polinomial(const Monomial& mono) :
+			_expression(std::vector<Monomial>(1, mono))
+		{}
 
-	const size_t size() const
-	{
-		return _expression.size();
-	}
+		#pragma region Methods
 
-	const auto begin() const
-	{
-		return _expression.begin();
-	}
-	const auto end() const
-	{
-		return _expression.end();
-	}
-
-	auto begin()
-	{
-		return _expression.begin();
-	}
-	auto end()
-	{
-		return _expression.end();
-	}
-
-	const std::string toString() const
-	{
-		std::string res;
-		for (const auto& i : _expression)
-			//res += (i.getNum() >= NumT(0) ? "+" : "") + i.toString();
-			res += '+' + i.toString();
-		return res;
-	}
-	const std::string toMathJaxString() const
-	{
-		std::string res;
-		if (!_expression.empty())
-			res += _expression[0].toMathJaxString();
-		for (size_t i = 1; i < _expression.size(); ++i)
-			res += '+' + _expression[i].toMathJaxString();
-		return res;
-	}
-
-	bool empty() const
-	{
-		return _expression.empty();
-	}
-
-	std::vector<Polinomial> groupAtVar(const Variable& var) const
-	{
-		std::map<frac::Fraction, Polinomial> map;
-		for (const auto& term : _expression)
+		const size_t size() const
 		{
-			frac::Fraction degr = 0;
-			for (const auto& coef : term.getCoefs())
-			{
-				if (coef.getVar() == var.getVar())
-				{
-					degr = coef.getDegr();
-					break;
-				}
-			}
-			map[degr] += term;
+			return _expression.size();
 		}
-		std::vector<Polinomial> res;
-		res.reserve(map.size());
-		for (auto& [key, value] : map)
-			res.push_back(std::move(value));
-		return res;
-	}
 
-	#pragma endregion
-
-	#pragma region operators
-
-	Polinomial operator-() const
-	{
-		Polinomial res = *this;
-		for (auto& i : res)
-			i = -i;
-		return res;
-	}
-
-	Polinomial& operator+=(const Polinomial& other)
-	{
-		if (this == &other)
+		const auto begin() const
 		{
-			for (auto& i : _expression)
-				i.setNum(i.getNum() * NumT(2));
+			return _expression.begin();
+		}
+		const auto end() const
+		{
+			return _expression.end();
+		}
+
+		auto begin()
+		{
+			return _expression.begin();
+		}
+		auto end()
+		{
+			return _expression.end();
+		}
+
+		const std::string toString() const
+		{
+			std::string res;
+			for (const auto& i : _expression)
+				//res += (i.getNum() >= NumT(0) ? "+" : "") + i.toString();
+				res += '+' + i.toString();
+			return res;
+		}
+		const std::string toMathJaxString() const
+		{
+			std::string res;
+			if (!_expression.empty())
+				res += _expression[0].toMathJaxString();
+			for (size_t i = 1; i < _expression.size(); ++i)
+				res += '+' + _expression[i].toMathJaxString();
+			return res;
+		}
+
+		bool empty() const
+		{
+			return _expression.empty();
+		}
+
+		std::vector<Polinomial> groupAtVar(const Variable& var) const
+		{
+			std::map<frac::Fraction, Polinomial> map;
+			for (const auto& term : _expression)
+			{
+				frac::Fraction degr = 0;
+				for (const auto& coef : term.getCoefs())
+				{
+					if (coef.getVar() == var.getVar())
+					{
+						degr = coef.getDegr();
+						break;
+					}
+				}
+				map[degr] += term;
+			}
+			std::vector<Polinomial> res;
+			res.reserve(map.size());
+			for (auto& [key, value] : map)
+				res.push_back(std::move(value));
+			return res;
+		}
+
+		#pragma endregion
+
+		#pragma region operators
+
+		Polinomial operator-() const
+		{
+			Polinomial res = *this;
+			for (auto& i : res)
+				i = -i;
+			return res;
+		}
+
+		Polinomial& operator+=(const Polinomial& other)
+		{
+			if (this == &other)
+			{
+				for (auto& i : _expression)
+					i.setNum(i.getNum() * NumT(2));
+				return *this;
+			}
+			for (auto& j : other._expression)
+			{
+				bool was = false;
+				for(auto& i : _expression)
+					if (i += j)
+					{
+						was = true;
+						break;
+					}
+				if(!was)
+					_expression.push_back(j);
+			}
+			reduction();
 			return *this;
 		}
-		for (auto& j : other._expression)
+		Polinomial& operator-=(const Polinomial& other)
 		{
-			bool was = false;
-			for(auto& i : _expression)
-				if (i += j)
-				{
-					was = true;
-					break;
-				}
-			if(!was)
-				_expression.push_back(j);
-		}
-		reduction();
-		return *this;
-	}
-	Polinomial& operator-=(const Polinomial& other)
-	{
-		if (this == &other)
-		{
-			_expression.clear();
+			if (this == &other)
+			{
+				_expression.clear();
+				return *this;
+			}
+			for (auto& j : other._expression)
+			{
+				bool was = false;
+				for (auto& i : _expression)
+					if (i -= j)
+					{
+						was = true;
+						break;
+					}
+				if (!was)
+					_expression.push_back(-j);
+			}
+			reduction();
 			return *this;
 		}
-		for (auto& j : other._expression)
+		Polinomial& operator*=(const Polinomial& other)
 		{
-			bool was = false;
-			for (auto& i : _expression)
-				if (i -= j)
+			std::vector<Monomial> res;
+			for(const auto& i : _expression)
+				for (const auto& j : other._expression)
 				{
-					was = true;
-					break;
+					Monomial pr = i;
+					pr *= j;
+					res.push_back(pr);
 				}
-			if (!was)
-				_expression.push_back(-j);
+			_expression = std::move(res);
+			reduction();
+			return *this;
 		}
-		reduction();
-		return *this;
-	}
-	Polinomial& operator*=(const Polinomial& other)
-	{
-		std::vector<Monomial> res;
-		for(const auto& i : _expression)
-			for (const auto& j : other._expression)
-			{
-				Monomial pr = i;
-				pr *= j;
-				res.push_back(pr);
-			}
-		_expression = std::move(res);
-		reduction();
-		return *this;
-	}
 
-	Polinomial operator+(const Polinomial& other) const
-	{
-		Polinomial pol = *this;
-		pol += other;
-		return pol;
-	}
-	Polinomial operator-(const Polinomial& other) const
-	{
-		Polinomial pol = *this;
-		pol -= other;
-		return pol;
-	}
-	Polinomial operator*(const Polinomial& other) const
-	{
-		Polinomial pol = *this;
-		pol *= other;
-		return pol;
-	}
+		Polinomial operator+(const Polinomial& other) const
+		{
+			Polinomial pol = *this;
+			pol += other;
+			return pol;
+		}
+		Polinomial operator-(const Polinomial& other) const
+		{
+			Polinomial pol = *this;
+			pol -= other;
+			return pol;
+		}
+		Polinomial operator*(const Polinomial& other) const
+		{
+			Polinomial pol = *this;
+			pol *= other;
+			return pol;
+		}
 
-	const Monomial& operator[](const size_t ind) const
-	{
-		return _expression[ind];
-	}
-	Monomial& operator[](const size_t ind)
-	{
-		return _expression[ind];
-	}
+		const Monomial& operator[](const size_t ind) const
+		{
+			return _expression[ind];
+		}
+		Monomial& operator[](const size_t ind)
+		{
+			return _expression[ind];
+		}
 
-	bool operator==(const Polinomial& other) const
-	{
-		if (_expression.size() != other._expression.size())
-			return false;
-		for (size_t i = 0; i < _expression.size(); ++i)
-			if (_expression[i] != other._expression[i])
+		bool operator==(const Polinomial& other) const
+		{
+			if (_expression.size() != other._expression.size())
 				return false;
-		return true;
-	}
-	bool operator!=(const Polinomial& other) const
-	{
-		return !this->operator==(other);
-	}
+			for (size_t i = 0; i < _expression.size(); ++i)
+				if (_expression[i] != other._expression[i])
+					return false;
+			return true;
+		}
+		bool operator!=(const Polinomial& other) const
+		{
+			return !this->operator==(other);
+		}
 
-	#pragma endregion
+		#pragma endregion
 
-	static Polinomial pow(const Polinomial& pol, unsigned int degr)
-	{
-		Polinomial res = Monomial{ NumT(1) };
-		for (unsigned int i = 0; i < degr; ++i)
-			res *= pol;
-		return res;
-	}
+		static Polinomial pow(const Polinomial& pol, unsigned int degr)
+		{
+			Polinomial res = Monomial{ NumT(1) };
+			for (unsigned int i = 0; i < degr; ++i)
+				res *= pol;
+			return res;
+		}
 
-private:
+	private:
 
-	std::vector<Monomial> _expression;
+		std::vector<Monomial> _expression;
 
-private:
+	private:
 
-	void reduction()
-	{
-		for (size_t i = _expression.size(); i > 0; --i)
-			if (PolinomUtils::isNull(_expression[i - 1].getNum()))
-				_expression.erase(_expression.begin() + i - 1);
-		for (size_t i = 0; i < _expression.size(); ++i)
-			for (size_t j = i + 1; j < _expression.size(); ++j)
-				if (_expression[i] += _expression[j])
-					_expression.erase(_expression.begin() + j--);
-	}
-};
+		void reduction()
+		{
+			for (size_t i = _expression.size(); i > 0; --i)
+				if (PolinomUtils::isNull(_expression[i - 1].getNum()))
+					_expression.erase(_expression.begin() + i - 1);
+			for (size_t i = 0; i < _expression.size(); ++i)
+				for (size_t j = i + 1; j < _expression.size(); ++j)
+					if (_expression[i] += _expression[j])
+						_expression.erase(_expression.begin() + j--);
+		}
+	};
 
-Polinomial operator+(const Monomial& a, const Monomial& b)
-{
-	return Polinomial(a) + b;
 }
-Polinomial operator-(const Monomial& a, const Monomial& b)
+
+expr::Polinomial operator+(const expr::Monomial& a, const expr::Monomial& b)
 {
-	return Polinomial(a) - b;
+	return expr::Polinomial(a) + b;
 }
-Polinomial operator*(const Monomial& a, const Monomial& b)
+expr::Polinomial operator-(const expr::Monomial& a, const expr::Monomial& b)
 {
-	Monomial pr = a;
+	return expr::Polinomial(a) - b;
+}
+expr::Polinomial operator*(const expr::Monomial& a, const expr::Monomial& b)
+{
+	expr::Monomial pr = a;
 	pr *= b;
-	return Polinomial(pr);
+	return expr::Polinomial(pr);
 }
-Polinomial operator/(const Monomial& a, const Monomial& b)
+expr::Polinomial operator/(const expr::Monomial& a, const expr::Monomial& b)
 {
-	Monomial pr = a;
+	expr::Monomial pr = a;
 	pr /= b;
-	return Polinomial(pr);
+	return expr::Polinomial(pr);
 }
