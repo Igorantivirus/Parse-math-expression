@@ -27,13 +27,13 @@ namespace expr
 
 		private:
 
-			Tokenizer<Complex> tok;
+			Tokenizer tok;
 
 		private:
 
 			void preproc(std::string& str) const
 			{
-				Preprocessor<Complex> proc;
+				Preprocessor proc;
 				proc.fullPreprocess(str);
 				if (!proc.isGoodBrackets(str))
 					throw ParseException("Brackets are not good", ParseException::ErrorT::brackets);

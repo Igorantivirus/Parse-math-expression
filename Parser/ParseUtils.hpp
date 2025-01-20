@@ -39,7 +39,6 @@ namespace expr
 			}
 		}
 
-		template<typename Complex>
 		class Preprocessor
 		{
 		public:
@@ -90,7 +89,6 @@ namespace expr
 
 		};
 
-		template<typename Complex>
 		class Tokenizer
 		{
 		public:
@@ -115,7 +113,7 @@ namespace expr
 						}
 					}
 				}
-				Preprocessor<Complex> proc;
+				Preprocessor proc;
 				for (size_t i = tokens.size() - 1; i > 0; --i)
 				{
 					if ((parseFuncs::isOpenBracket(tokens[i][0]) || parseFuncs::isCloseBracket(tokens[i].back())) &&
@@ -145,7 +143,7 @@ namespace expr
 						}
 					}
 				}
-				Preprocessor<Complex> proc;
+				Preprocessor proc;
 				for (size_t i = tokens.size() - 1; i > 0; --i)
 				{
 					if ((parseFuncs::isOpenBracket(tokens[i][0]) || parseFuncs::isCloseBracket(tokens[i].back())) &&

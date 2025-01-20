@@ -17,7 +17,7 @@ namespace expr
 			void parse(const std::string& str, std::vector<Expression<Complex>>& res) const
 			{
 				res.clear();
-				Tokenizer<Complex> tokniser;
+				Tokenizer tokniser;
 
 				std::vector<std::string> tkns;
 				tokniser.tokenizerEquation(str, tkns);

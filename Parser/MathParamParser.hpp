@@ -92,7 +92,7 @@ namespace expr
 			}
 			void insertVariables(const std::map<std::string, std::string>& vars, std::string& str) const
 			{
-				Preprocessor<Complex> proc;
+				Preprocessor proc;
 				proc.constantEdding(vars, str);
 			}
 		};
