@@ -87,12 +87,12 @@ namespace expr
 			std::string denom;
 			for (const auto& i : _coefs)
 			{
-				if (i.getDegr() > 0)
+				if (i.getDegr().real() > 0)
 					num += i.toMathJaxString();
 				else
 				{
 					Variable pr = i;
-					pr.setDegr(pr.getDegr() * -1);
+					pr.setDegr(pr.getDegr() * Complex(-1));
 					denom += pr.toMathJaxString();
 				}
 			}

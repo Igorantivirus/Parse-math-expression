@@ -207,7 +207,7 @@ namespace expr
 
 		static Polinomial pow(const Polinomial& pol, unsigned int degr)
 		{
-			Polinomial res = Monomial{ Complex(1) };
+			Polinomial res = Monomial<Complex>{ Complex(1) };
 			for (unsigned int i = 0; i < degr; ++i)
 				res *= pol;
 			return res;
