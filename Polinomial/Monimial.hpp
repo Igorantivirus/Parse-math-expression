@@ -120,13 +120,13 @@ namespace expr
 			if (this == &other)
 			{
 				for (auto& i : _coefs)
-					i.setDegr(i.getDegr() + 1);
+					i.setDegr(i.getDegr() + Complex(1));
 			}
 			else
 			{
 				for (const auto& j : other._coefs)
 				{
-					auto it = std::find_if(_coefs.begin(), _coefs.end(), [&](const Variable& i)
+					auto it = std::find_if(_coefs.begin(), _coefs.end(), [&](const Variable<Complex>& i)
 						{
 							return i.getVar() == j.getVar();
 						});
@@ -251,7 +251,7 @@ namespace expr
 					_coefs.push_back(i);
 			}
 			for (size_t i = _coefs.size(); i > 0; --i)
-				if (_coefs[i - 1].getDegr() == 0)
+				if (_coefs[i - 1].getDegr() == Complex(0))
 					_coefs.erase(_coefs.begin() + i - 1);
 			std::sort(_coefs.begin(), _coefs.end());
 		}

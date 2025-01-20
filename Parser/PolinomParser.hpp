@@ -17,7 +17,12 @@ namespace expr
 			{
 				preproc(str);
 
-				return subParse(str);
+				std::vector<std::string> tokens;
+				tok.tokinizerPolinom(str, tokens);
+
+				PolinomExpression expr;
+				fillPolinom(tokens, expr);
+				return procession(expr);
 			}
 
 		private:
@@ -53,6 +58,7 @@ namespace expr
 
 				PolinomExpression expr;
 				fillPolinom(tokens, expr);
+
 				return procession(expr);
 			}
 
@@ -78,7 +84,7 @@ namespace expr
 					const char c = tkns[i][0];
 					if (c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z')
 					{
-						Polinomial<Complex> pr = Monomial(1, c);
+						Polinomial<Complex> pr = Monomial<Complex>(1, c);
 						expr.push_back({ pr, getNextAction(tkns, i) });
 						continue;
 					}
@@ -91,7 +97,7 @@ namespace expr
 				if (ind == tkns.size() - 1)
 					return ActionT::none;
 				char id = 0;
-				TypeOfType type = mconverter.toTOT(tkns[i + 1], id);
+				TypeOfType type = mconverter.toTOT(tkns[ind + 1], id);
 
 				if (type == TypeOfType::action)
 				{
@@ -107,26 +113,26 @@ namespace expr
 			{
 				mathWorker::MathWorker<Complex> wrkr;
 
-				return wrkr.abs(a.imag()) < 1e-10 && wrkr.abs(a.real() - (long long)(a.real())) < 1e-10;
+				return std::abs(a.imag()) < 1e-10 && std::abs(a.real() - (long long)(a.real())) < 1e-10;
 			}
 
 			void procPow(PolinomExpression& expr) const
 			{
 				for (size_t i = 0; i < expr.size() - 1; ++i)
 				{
-					if (expr[i].second() != ActionT::pow)
+					if (expr[i].second != ActionT::pow)
 						continue;
-					Polinomial<Complex> degr = expr[i + 1].first();
-					if (!(degr.size() == 1 && degr[0].getCoefs().size() == 1))
+					Polinomial<Complex> degr = expr[i + 1].first;
+					if (!(degr.size() == 1 && degr[0].getCoefs().size() <= 1))
 						throw ParseException("Error of pow.");
 					Complex pow = degr[0].getNum();
-					if(isZ(pow))
+					if(!isZ(pow))
 						throw ParseException("Error of pow.");
 
 					unsigned int realPow = static_cast<unsigned int>(pow.real());
 
-					expr[i].first() = Polinomial<Complex>::pow(expr[i].first(), realPow);
-					expr[i].second() = expr[i + 1].second();
+					expr[i].first = Polinomial<Complex>::pow(expr[i].first, realPow);
+					expr[i].second = expr[i + 1].second;
 					expr.erase(expr.begin() + i + 1);
 					--i;
 				}
@@ -136,20 +142,20 @@ namespace expr
 			{
 				for (size_t i = 0; i < expr.size() - 1; ++i)
 				{
-					if (expr[i].second() == ActionT::multiply)
+					if (expr[i].second == ActionT::multiply || expr[i].second == ActionT::hiddMultiply)
 					{
-						Polinomial<Complex> b = expr[i + 1].first();
-						expr[i].first() *=  b;
-						expr[i].second() = expr[i + 1].second();
+						Polinomial<Complex> b = expr[i + 1].first;
+						expr[i].first *=  b;
+						expr[i].second = expr[i + 1].second;
 						expr.erase(expr.begin() + i + 1);
 						--i;
 					}
-					else
+					else if (expr[i].second == ActionT::div)
 					{
-						Polinomial<Complex> b = expr[i + 1].first();
-						if (!(expr[i].first() /= b))
+						Polinomial<Complex> b = expr[i + 1].first;
+						if (!(expr[i].first /= b))
 							throw ParseException("Error div.");
-						expr[i].second() = expr[i + 1].second();
+						expr[i].second = expr[i + 1].second;
 						expr.erase(expr.begin() + i + 1);
 						--i;
 					}
@@ -159,24 +165,24 @@ namespace expr
 			Polinomial<Complex> procession(PolinomExpression& expr) const
 			{
 				if (expr.empty())
-					return ParseException("Empty expr");
+					throw ParseException("Empty expr");
 				procPow(expr);
 				procMul(expr);
 				Polinomial<Complex> res;
 				for (size_t i = 0; i < expr.size() - 1; ++i)
 				{
-					if (expr[i].second() != ActionT::plus && expr[i].second() != ActionT::minus)
+					if (expr[i].second != ActionT::plus && expr[i].second != ActionT::minus)
 						throw ParseException("Unknown operation.");
-					Polinomial<Complex> b = expr[i + 1].first();
-					if (expr[i].second() == ActionT::plus)
-						expr[i].first() += b;
+					Polinomial<Complex> b = expr[i + 1].first;
+					if (expr[i].second == ActionT::plus)
+						expr[i].first += b;
 					else
-						expr[i].first() -= b;
-					expr[i].second() = expr[i + 1].second();
+						expr[i].first -= b;
+					expr[i].second = expr[i + 1].second;
 					expr.erase(expr.begin() + i + 1);
 					--i;
 				}
-				return expr[0];
+				return expr[0].first;
 			}
 
 

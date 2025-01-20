@@ -18,6 +18,12 @@ namespace expr
 		Polinomial(const Monomial<Complex>& mono) :
 			_expression(std::vector<Monomial<Complex>>(1, mono))
 		{}
+		Polinomial(const Polinomial& other) :
+			_expression(other._expression)
+		{}
+		Polinomial(Polinomial&& other) noexcept :
+			_expression(std::move(other._expression))
+		{}
 
 		#pragma region Methods
 
@@ -148,7 +154,7 @@ namespace expr
 		}
 		Polinomial& operator*=(const Polinomial& other)
 		{
-			std::vector<Monomial> res;
+			std::vector<Monomial<Complex>> res;
 			for(const auto& i : _expression)
 				for (const auto& j : other._expression)
 				{
@@ -214,6 +220,17 @@ namespace expr
 		bool operator!=(const Polinomial& other) const
 		{
 			return !this->operator==(other);
+		}
+
+		Polinomial& operator=(const Polinomial& other)
+		{
+			_exception = other._expression;
+			return *this;
+		}
+		Polinomial& operator=(Polinomial&& other)
+		{
+			_expression = std::move(other._expression);
+			return *this;
 		}
 
 		#pragma endregion
