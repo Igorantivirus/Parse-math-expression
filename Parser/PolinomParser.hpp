@@ -27,6 +27,10 @@ namespace expr
 
 		private:
 
+			using PolinomExpression = std::vector<std::pair<Polinomial<Complex>, ActionT>>;
+
+		private:
+
 			void preproc(std::string& str) const
 			{
 				Preprocessor proc;
@@ -35,7 +39,20 @@ namespace expr
 					throw ParseException("Brackets are not good", ParseException::ErrorT::brackets);
 			}
 
-		private:
+			bool isLetter(const std::string& s) const
+			{
+				if (s.size() != 1)
+					return false;
+				const char c = s[0];
+				return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z';
+			}
+			bool isSign(const std::string& s)
+			{
+				if (s.size() != 1)
+					return false;
+				const char c = s[0];
+				return c == '+' || c == '-' || c == '*' || c == '/';
+			}
 
 			Polinomial<Complex> subParse(std::string str) const
 			{
@@ -57,7 +74,47 @@ namespace expr
 
 			void fillPolinom(const std::vector<std::string>& tkns, PolinomExpression<Complex>& expr)
 			{
+				if (tkns.empty())
+					throw ParseException("Empty string");
+				mathWorker::MathWorker<Complex> worker;
+				for (size_t i = 0; i < tkns.size(); ++i)
+				{
+					if (parseFuncs::isNum(tkns[i]))
+					{
+						Polinomial<Complex> pr = Monomial(worker.toComplex(tkns[i]));
+						expr.add(pr, getNextAction(tkns, i));
+						continue;
+					}
+					if (tkns[i].size() != 1)
+					{
+						Polinomial<Complex> pr = subParse(tkns[i]);
+						expr.add(pr, getNextAction(tkns, i));
+						continue;
+					}
+					const char c = tkns[i][0];
+					if (c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z')
+					{
+						Polinomial<Complex> pr = Monomial(1, c);
+						expr.add(pr, getNextAction(tkns, i));
+						continue;
+					}
+					throw ParseException("Unknown Token: \"" + tkns[i] + '\"');
+				}
+			}
 
+			ActionT getNextAction(const std::vector<std::string>& tkns, size_t& ind)
+			{
+				if (ind == tkns.size() - 1)
+					return ActionT::none;
+				char id = 0;
+				TypeOfType type = mconverter.toTOT(tkns[i + 1], id);
+
+				if (type == TypeOfType::action)
+				{
+					++ind;
+					return static_cast<ActionT>(id);
+				}
+				return ActionT::hiddMultiply;
 			}
 
 		//	void strParse(std::string str, Expression<Complex>& res) const
