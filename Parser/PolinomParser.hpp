@@ -2,7 +2,6 @@
 
 #include "ParseUtils.hpp"
 #include "../Polinomial/Polinomial.hpp"
-#include "../Polinomial/PolinomExpression.hpp"
 
 namespace expr
 {
@@ -39,21 +38,6 @@ namespace expr
 					throw ParseException("Brackets are not good", ParseException::ErrorT::brackets);
 			}
 
-			bool isLetter(const std::string& s) const
-			{
-				if (s.size() != 1)
-					return false;
-				const char c = s[0];
-				return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z';
-			}
-			bool isSign(const std::string& s)
-			{
-				if (s.size() != 1)
-					return false;
-				const char c = s[0];
-				return c == '+' || c == '-' || c == '*' || c == '/';
-			}
-
 			Polinomial<Complex> subParse(std::string str) const
 			{
 				if (parseFuncs::isOpenBracket(str[0]))
@@ -67,12 +51,12 @@ namespace expr
 				std::vector<std::string> tokens;
 				tok.tokinizerPolinom(str, tokens);
 
-				PolinomExpression<Complex> expr;
+				PolinomExpression expr;
 				fillPolinom(tokens, expr);
-				return expr.procession();
+				return procession(expr);
 			}
 
-			void fillPolinom(const std::vector<std::string>& tkns, PolinomExpression<Complex>& expr)
+			void fillPolinom(const std::vector<std::string>& tkns, PolinomExpression& expr) const
 			{
 				if (tkns.empty())
 					throw ParseException("Empty string");
@@ -82,27 +66,27 @@ namespace expr
 					if (parseFuncs::isNum(tkns[i]))
 					{
 						Polinomial<Complex> pr = Monomial(worker.toComplex(tkns[i]));
-						expr.add(pr, getNextAction(tkns, i));
+						expr.push_back({pr, getNextAction(tkns, i) });
 						continue;
 					}
 					if (tkns[i].size() != 1)
 					{
 						Polinomial<Complex> pr = subParse(tkns[i]);
-						expr.add(pr, getNextAction(tkns, i));
+						expr.push_back({ pr, getNextAction(tkns, i) });
 						continue;
 					}
 					const char c = tkns[i][0];
 					if (c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z')
 					{
 						Polinomial<Complex> pr = Monomial(1, c);
-						expr.add(pr, getNextAction(tkns, i));
+						expr.push_back({ pr, getNextAction(tkns, i) });
 						continue;
 					}
 					throw ParseException("Unknown Token: \"" + tkns[i] + '\"');
 				}
 			}
 
-			ActionT getNextAction(const std::vector<std::string>& tkns, size_t& ind)
+			ActionT getNextAction(const std::vector<std::string>& tkns, size_t& ind) const
 			{
 				if (ind == tkns.size() - 1)
 					return ActionT::none;
@@ -117,121 +101,84 @@ namespace expr
 				return ActionT::hiddMultiply;
 			}
 
-		//	void strParse(std::string str, Expression<Complex>& res) const
-		//	{
-		//		if (str.empty())
-		//			throw ParseException("Empty string");
-		//		if (parseFuncs::isOpenBracket(str[0]))
-		//		{
-		//			if (str.size() < 3)
-		//				throw ParseException("Empty bracket", ParseException::ErrorT::brackets);
-		//			BracketT brk = mconverter.toBracket(str[0]);
-		//			res.setBracket(brk);
-		//			str.pop_back();
-		//			str.erase(str.begin());
-		//		}
-		//		std::vector<std::string> tkns;
-		//		tok.tokenizer(str, tkns);
-		//		fillExpression(tkns, res);
-		//	}
+		private:
 
-		//	void fillExpression(const std::vector<std::string>& tkns, Expression<Complex>& expr) const
-		//	{
-		//		if (tkns.empty())
-		//			throw ParseException("Empty string");
-		//		mathWorker::MathWorker<Complex> worker;
-		//		for (size_t i = 0; i < tkns.size(); ++i)
-		//		{
-		//			if (parseFuncs::isNum(tkns[i]))
-		//			{
-		//				Value<Complex> prv = worker.toComplex(tkns[i]);
-		//				fillAction(tkns, i, expr, prv);
-		//				continue;
-		//			}
-		//			char id = 0;
-		//			TypeOfType type = mconverter.toTOT(tkns[i], id);
-		//			if (type == TypeOfType::bracket)
-		//			{
-		//				Expression<Complex> pre;
-		//				strParse(tkns[i], pre);
-		//				fillAction(tkns, i, expr, pre);
-		//			}
-		//			else if (type == TypeOfType::action)
-		//			{
-		//				if (id == static_cast<char>(ActionT::minus))
-		//				{
-		//					Value<Complex> minus(Complex(-1), ActionT::multiply);
-		//					expr.add(minus);
-		//					continue;
-		//				}
-		//				else
-		//					throw ParseException("Double arithmetic operation", ParseException::ErrorT::action);
-		//			}
-		//			else if (type == TypeOfType::func)
-		//				fillFunction(tkns, i, expr, id);
-		//			else if (type == TypeOfType::tFunc)
-		//				fillTwoFunction(tkns, i, expr, id);
-		//			else
-		//				throw ParseException("Unknown type of token: \"" + tkns[i] + '\"', ParseException::ErrorT::word);
-		//		}
-		//	}
+			bool isZ(const Complex a) const
+			{
+				mathWorker::MathWorker<Complex> wrkr;
 
-		//private:
+				return wrkr.abs(a.imag()) < 1e-10 && wrkr.abs(a.real() - (long long)(a.real())) < 1e-10;
+			}
 
-		//	void fillAction(const std::vector<std::string>& tkns, size_t& i, Expression<Complex>& expr, MathBase& value) const
-		//	{
-		//		if (i + 1 < tkns.size())
-		//		{
-		//			char id = 0;
-		//			TypeOfType type = mconverter.toTOT(tkns[i + 1], id);
+			void procPow(PolinomExpression& expr) const
+			{
+				for (size_t i = 0; i < expr.size() - 1; ++i)
+				{
+					if (expr[i].second() != ActionT::pow)
+						continue;
+					Polinomial<Complex> degr = expr[i + 1].first();
+					if (!(degr.size() == 1 && degr[0].getCoefs().size() == 1))
+						throw ParseException("Error of pow.");
+					Complex pow = degr[0].getNum();
+					if(isZ(pow))
+						throw ParseException("Error of pow.");
 
-		//			if (type == TypeOfType::action)
-		//			{
-		//				value.setAct(static_cast<ActionT>(id));
-		//				++i;
-		//			}
-		//			else if (type == TypeOfType::pFunc)
-		//			{
-		//				++i;
-		//				PostfixFunction<Complex> f;
-		//				f.setType(static_cast<PostfixFunctionT>(id));
-		//				f.setArgument(value);
-		//				fillAction(tkns, i, expr, f);
-		//				return;
-		//			}
-		//			else
-		//				value.setAct(ActionT::hiddMultiply);
-		//		}
-		//		expr.add(value);
-		//	}
+					unsigned int realPow = static_cast<unsigned int>(pow.real());
 
-		//	void fillFunction(const std::vector<std::string>& tkns, size_t& i, Expression<Complex>& expr, const char id) const
-		//	{
-		//		StanartFunction<Complex> prf;
-		//		prf.setType(static_cast<FunctionT>(id));
-		//		++i;
-		//		if (i == tkns.size())
-		//			throw ParseException("Empty function", ParseException::ErrorT::func);
-		//		Expression<Complex> pr;
-		//		strParse(tkns[i], pr);
-		//		prf.setArgument(pr);
-		//		fillAction(tkns, i, expr, prf);
-		//	}
+					expr[i].first() = Polinomial<Complex>::pow(expr[i].first(), realPow);
+					expr[i].second() = expr[i + 1].second();
+					expr.erase(expr.begin() + i + 1);
+					--i;
+				}
+			}
 
-		//	void fillTwoFunction(const std::vector<std::string>& tkns, size_t& i, Expression<Complex>& expr, const char id) const
-		//	{
-		//		TwoPramFunction<Complex> f;
-		//		f.setType(static_cast<TwoFunctionT>(id));
-		//		++i;
-		//		if (i + 1 >= tkns.size())
-		//			throw ParseException("Empty function", ParseException::ErrorT::func);
-		//		Expression<Complex> pr1, pr2;
-		//		strParse(tkns[i++], pr1);
-		//		strParse(tkns[i], pr2);
-		//		f.setArgument(pr2);
-		//		f.setSpecilAgrument(pr1);
-		//		fillAction(tkns, i, expr, f);
-		//	}
+			void procMul(PolinomExpression& expr) const
+			{
+				for (size_t i = 0; i < expr.size() - 1; ++i)
+				{
+					if (expr[i].second() == ActionT::multiply)
+					{
+						Polinomial<Complex> b = expr[i + 1].first();
+						expr[i].first() *=  b;
+						expr[i].second() = expr[i + 1].second();
+						expr.erase(expr.begin() + i + 1);
+						--i;
+					}
+					else
+					{
+						Polinomial<Complex> b = expr[i + 1].first();
+						if (!(expr[i].first() /= b))
+							throw ParseException("Error div.");
+						expr[i].second() = expr[i + 1].second();
+						expr.erase(expr.begin() + i + 1);
+						--i;
+					}
+				}
+			}
+
+			Polinomial<Complex> procession(PolinomExpression& expr) const
+			{
+				if (expr.empty())
+					return ParseException("Empty expr");
+				procPow(expr);
+				procMul(expr);
+				Polinomial<Complex> res;
+				for (size_t i = 0; i < expr.size() - 1; ++i)
+				{
+					if (expr[i].second() != ActionT::plus && expr[i].second() != ActionT::minus)
+						throw ParseException("Unknown operation.");
+					Polinomial<Complex> b = expr[i + 1].first();
+					if (expr[i].second() == ActionT::plus)
+						expr[i].first() += b;
+					else
+						expr[i].first() -= b;
+					expr[i].second() = expr[i + 1].second();
+					expr.erase(expr.begin() + i + 1);
+					--i;
+				}
+				return expr[0];
+			}
+
 
 		};
 

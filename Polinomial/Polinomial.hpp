@@ -160,6 +160,19 @@ namespace expr
 			reduction();
 			return *this;
 		}
+		bool operator/=(const Polinomial& other)
+		{
+			if (other._expression.size() != 1)
+				return false;
+			Monomial<Complex> mon = other._expression[0];
+			mon.setNum(Complex(1) / mon.getNum());
+			auto coefs = mon.getCoefs();
+			for (auto& i : coefs)
+				i.setDegr(-i.getDegr());
+			mon.setCoefs(coefs);
+			this->operator*=(mon);
+			return true;
+		}
 
 		Polinomial operator+(const Polinomial& other) const
 		{
