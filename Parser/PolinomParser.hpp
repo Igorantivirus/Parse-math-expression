@@ -99,10 +99,37 @@ namespace expr
 				}
 			}
 
+			ActionT getAct(const std::string& s) const
+			{
+				if (s.size() != 1)
+					return ActionT::none;
+				char c = s[0];
+				if (c == '+')
+					return ActionT::plus;
+				if (c == '-')
+					return ActionT::minus;
+				if (c == '*')
+					return ActionT::multiply;
+				if (c == '/')
+					return ActionT::div;
+				if (c == '^')
+					return ActionT::pow;
+			}
+
 			ActionT getNextAction(const std::vector<std::string>& tkns, size_t& ind) const
 			{
 				if (ind == tkns.size() - 1)
 					return ActionT::none;
+				
+				
+				/*ActionT act = getAct(tkns[ind + 1]);
+				if(act != ActionT::none)
+				{
+					++ind;
+					return static_cast<ActionT>(id);
+				}
+				return ActionT::hiddMultiply;*/
+				
 				char id = 0;
 				TypeOfType type = mconverter.toTOT(tkns[ind + 1], id);
 

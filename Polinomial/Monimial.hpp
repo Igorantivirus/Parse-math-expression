@@ -76,7 +76,7 @@ namespace expr
 		const std::string toString() const
 		{
 			mathWorker::MathWorker<Complex> wrk;
-			std::string res = wrk.toStr(_num);
+			std::string res = '(' + wrk.toStr(_num) + ')';
 			for (const auto& i : _coefs)
 				res += i.toString();
 			return res;

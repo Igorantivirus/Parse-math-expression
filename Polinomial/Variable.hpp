@@ -37,7 +37,8 @@ namespace expr
 
 		const std::string toString() const
 		{
-			return std::string(1, _var) + (_degr == 1 ? "" : "^(" + _degr.toString(true)) + ')';
+			mathWorker::MathWorker<Complex> wrkr;
+			return std::string(1, _var) + (_degr == Complex(1) ? "" : ("^(" + wrkr.toStr(_degr) + ')'));
 		}
 		const std::string toMathJaxString() const
 		{

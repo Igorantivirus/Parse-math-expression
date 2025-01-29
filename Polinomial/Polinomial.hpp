@@ -53,8 +53,10 @@ namespace expr
 		const std::string toString() const
 		{
 			std::string res;
-			for (const auto& i : _expression)
-				res += '+' + i.toString();
+			if (!_expression.empty())
+				res += _expression[0].toString();
+			for (size_t i = 1; i < _expression.size(); ++i)
+				res += '+' + _expression[i].toString();
 			return res;
 		}
 		const std::string toMathJaxString() const
