@@ -1,6 +1,7 @@
 #pragma once
 
 #include<vector>
+#include<iostream>
 #include<string>
 #include<memory>
 #include<map>
@@ -284,7 +285,7 @@ namespace expr
 			TDReader file(path);
 			if (!file.isOpen())
 			{
-				//std::cerr << "Not found \"" << path << '\"' << '\n';
+				std::cerr << "Not found bd.td file on path: \"" << path << '\"' << '\n';
 				return;
 			}
 			std::vector<std::string> prArr;
