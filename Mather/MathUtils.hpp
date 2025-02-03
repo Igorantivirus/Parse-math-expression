@@ -45,6 +45,9 @@ namespace expr
 		arccos,
 		arctg,
 		arcctg,
+
+		floor,
+		frac
 	};
 
 	enum class TwoFunctionT : char
@@ -101,6 +104,8 @@ namespace expr
 			case FunctionT::arccos: return worker.arccos(v);
 			case FunctionT::arctg: return worker.arctg(v);
 			case FunctionT::arcctg: return worker.arcctg(v);
+			case FunctionT::floor: return worker.floor(v);
+			case FunctionT::frac: return worker.fractional(v);
 			default: return worker.getNan();
 			}
 			return worker.getNan();
