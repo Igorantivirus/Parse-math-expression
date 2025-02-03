@@ -62,15 +62,6 @@ namespace expr
 		factorial
 	};
 
-	//enum class TypeOfType : char
-	//{
-	//	none = 0,
-	//	action = 1,
-	//	func = 2,
-	//	tFunc = 3,
-	//	pFunc = 4
-	//};
-
 	namespace solver
 	{
 

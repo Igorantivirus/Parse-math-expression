@@ -31,6 +31,15 @@ namespace expr
 			return s.size() == 1 && (s[0] == '+' || s[0] == '-' || s[0] == '*' || s[0] == '/' || s[0] == '%' || s[0] == '^');
 		}
 
+		bool isNum(const char c)
+		{
+			return (c >= '0' && c <= '9') || c == 'i';
+		}
+		bool isNum(const std::string& s)
+		{
+			return isNum(s[0]) || (s.size() >= 2 && (s[0] == '-' || s[0] == '.') && isNum(s[1])) || s == "nan" || s == "-nan" || s == "inf" || s == "-inf";
+		}
+
 		const std::string toStr(const ActionT v) const
 		{
 			return std::string(1, static_cast<char>(v));

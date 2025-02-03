@@ -6,7 +6,6 @@ namespace expr
 {
 	namespace parse
 	{
-
 		template<typename Complex>
 		class MathParser
 		{
@@ -33,9 +32,7 @@ namespace expr
 
 			void preproc(std::string& str) const
 			{
-				Preprocessor proc;
-				proc.fullPreprocess(str);
-				if (!proc.isGoodBrackets(str))
+				if (!isGoodBrackets(str))
 					throw ParseException("Brackets are not good", ParseException::ErrorT::brackets);
 			}
 
@@ -45,7 +42,7 @@ namespace expr
 			{
 				if (str.empty())
 					throw ParseException("Empty string");
-				if (parseFuncs::isOpenBracket(str[0]))
+				if (str[0] == '(')
 				{
 					if (str.size() < 3)
 						throw ParseException("Empty bracket", ParseException::ErrorT::brackets);
@@ -66,7 +63,7 @@ namespace expr
 				{
 					if (tkns[i].empty())
 						throw ParseException("Empty noken.");
-					if (parseFuncs::isNum(tkns[i]))
+					if (mconverter.isNum(tkns[i]))
 					{
 						Value<Complex> prv = worker.toComplex(tkns[i]);
 						fillPostfix(tkns, i, expr, prv);

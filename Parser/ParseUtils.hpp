@@ -1,7 +1,7 @@
 #pragma once
 
-#include <regex>
 #include <stack>
+#include <regex>
 
 #include"../Mather/Value.hpp"
 #include"../Mather/StandartFunction.hpp"
@@ -15,79 +15,20 @@ namespace expr
 {
 	namespace parse
 	{
-		namespace parseFuncs
+		bool isGoodBrackets(const std::string& str)
 		{
-			bool isOpenBracket(const char c)
-			{
-				return c == '(' || c == '[' || c == '{' || c == '<';
-			}
-			bool isCloseBracket(const char c)
-			{
-				return c == ')' || c == '}' || c == '>' || c == ']';
-			}
-			bool isWord(const char c)
-			{
-				return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
-			}
-			bool isNum(const char c)
-			{
-				return (c >= '0' && c <= '9') || c == 'i';
-			}
-			bool isNum(const std::string& s)
-			{
-				return isNum(s[0]) || (s.size() >= 2 && (s[0] == '-' || s[0] == '.') && isNum(s[1])) || s == "nan" || s == "-nan" || s == "inf" || s == "-inf";
-			}
-		}
-
-		class Preprocessor
-		{
-		public:
-
-			void fullPreprocess(std::string& expression) const
-			{
-				constantEdding(mconverter.getConstantDictionary(), expression);
-				modulEdit(expression);
-			}
-
-			void modulEdit(std::string& str) const
-			{
-				if (str[0] == '|')
-					str[0] = '<';
-				if (str.back() == '|')
-					str.back() = '>';
-
-				size_t pos;
-				while ((pos = str.find('|')) != std::string::npos)
+			std::stack<char> s;
+			for (const auto& i : str)
+				if (i == '(')
+					s.push(i);
+				else if (i == ')')
 				{
-					if (parseFuncs::isNum(str[pos - 1]) || parseFuncs::isCloseBracket(str[pos - 1]))
-						str[pos] = '>';
-					else
-						str[pos] = '<';
+					if (s.empty() || s.top() != mconverter.oppositeBracket(i))
+						return false;
+					s.pop();
 				}
-			}
-
-			void constantEdding(const std::map<std::string, std::string>& map, std::string& str) const
-			{
-				for (auto const& [key, value] : map)
-					replaceAll(str, key, value);
-			}
-
-			bool isGoodBrackets(const std::string& str) const
-			{
-				std::stack<char> s;
-				for (const auto& i : str)
-					if (parseFuncs::isOpenBracket(i))
-						s.push(i);
-					else if (parseFuncs::isCloseBracket(i))
-					{
-						if (s.empty() || s.top() != mconverter.oppositeBracket(i))
-							return false;
-						s.pop();
-					}
-				return s.empty();
-			}
-
-		};
+			return s.empty();
+		}
 
 		class Tokenizer
 		{
@@ -113,11 +54,9 @@ namespace expr
 						}
 					}
 				}
-				Preprocessor proc;
 				for (size_t i = tokens.size() - 1; i > 0; --i)
 				{
-					if ((parseFuncs::isOpenBracket(tokens[i][0]) || parseFuncs::isCloseBracket(tokens[i].back())) &&
-						!proc.isGoodBrackets(tokens[i]))
+					if ((tokens[i][0] == '(' || tokens[i].back() == ')') && !isGoodBrackets(tokens[i]))
 					{
 						tokens[i - 1] += tokens[i];
 						tokens.erase(tokens.begin() + i);
@@ -143,11 +82,9 @@ namespace expr
 						}
 					}
 				}
-				Preprocessor proc;
 				for (size_t i = tokens.size() - 1; i > 0; --i)
 				{
-					if ((parseFuncs::isOpenBracket(tokens[i][0]) || parseFuncs::isCloseBracket(tokens[i].back())) &&
-						!proc.isGoodBrackets(tokens[i]))
+					if ((tokens[i][0] == '(' || tokens[i].back() == ')') && !isGoodBrackets(tokens[i]))
 					{
 						tokens[i - 1] += tokens[i];
 						tokens.erase(tokens.begin() + i);
@@ -167,7 +104,7 @@ namespace expr
 						tokens.push_back(expression.substr(last, ind - last));
 						continue;
 					}
-					while (parseFuncs::isNum(expression[++ind])) {}
+					while (mconverter.isNum(expression[++ind])) {}
 					tokens.push_back(expression.substr(last, ind - last));
 				}
 				tokens.push_back(expression.substr(last));
