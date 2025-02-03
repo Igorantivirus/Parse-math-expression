@@ -12,7 +12,7 @@ namespace expr
 	public:
 		Expression() : MathBase() {}
 		Expression(const ActionT act) : MathBase(act) {}
-		Expression(const Expression& other) : MathBase(other), _type(other._type)
+		Expression(const Expression& other) : MathBase(other)
 		{
 			for (const auto& i : other._expression)
 				_expression.push_back(i->copy());
@@ -21,7 +21,6 @@ namespace expr
 		Expression operator=(const Expression& other)
 		{
 			_act = other._act;
-			_type = other._type;
 
 			_expression.clear();
 			for (const auto& i : other._expression)
@@ -34,22 +33,23 @@ namespace expr
 		{
 			std::string res;
 			
-			if(_expression.size() > 1 || _type != BracketT::standart)
-				res = mconverter.toStrOpen(_type);
+			if (_expression.size() > 1)
+				res.push_back('(');
 
 			for (auto& i : _expression)
 				if (i != nullptr)
 					res += i->toStr() + mconverter.toStr(i->getAct());
-			if (_expression.size() > 1 || _type != BracketT::standart)
-				res += mconverter.toStrClose(_type);
+			
+			if (_expression.size() > 1)
+				res.push_back(')');
 			return res;
 		}
 		const std::string toMathJaxStr() const override
 		{
 			std::string res;
 
-			if (_expression.size() > 1 || _type != BracketT::standart)
-				res += (_type == BracketT::whole || _type == BracketT::fract ? "\\" : "") + mconverter.toStrOpen(_type);
+			if (_expression.size() > 1)
+				res.push_back('(');
 
 			for (size_t i = 0; i < _expression.size(); ++i)
 			{
@@ -63,17 +63,13 @@ namespace expr
 					++i;
 				}
 				else if (i - 1 < _expression.size() && _expression[i - 1]->getAct() == ActionT::pow)
-				{
 					res += '{' + _expression[i]->toMathJaxStr() + '}' + mconverter.toStr(_expression[i]->getAct());
-				}
 				else
-				{
 					res += _expression[i]->toMathJaxStr() + mconverter.toStr(_expression[i]->getAct());
-				}
 			}
 
-			if (_expression.size() > 1 || _type != BracketT::standart)
-				res += (_type == BracketT::whole || _type == BracketT::fract ? "\\" : "") + mconverter.toStrClose(_type);
+			if (_expression.size() > 1)
+				res.push_back(')');
 
 			return res;
 		}
@@ -92,20 +88,11 @@ namespace expr
 			processAt(values, { ActionT::multiply, ActionT::div, ActionT::wholeDiv, ActionT::mod });
 			processAt(values, { ActionT::plus, ActionT::minus });
 
-			return std::make_unique<Value<Complex>>(Value<Complex>(solver::solve<Complex>(values[0].getValue(), _type), _act));
+			return std::make_unique<Value<Complex>>(Value<Complex>(values[0].getValue(), _act));
 		}
 		MathBasePtr copy() const override
 		{
 			return std::make_unique<Expression>(*this);
-		}
-
-		BracketT getBracket() const
-		{
-			return _type;
-		}
-		void setBracket(const BracketT type)
-		{
-			_type = type;
 		}
 
 		void add(const MathBasePtr& arg)
@@ -145,8 +132,6 @@ namespace expr
 	private:
 
 		std::vector<MathBasePtr> _expression;
-
-		BracketT _type = BracketT::standart;
 
 	private:
 

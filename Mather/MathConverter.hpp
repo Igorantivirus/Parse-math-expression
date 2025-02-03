@@ -54,48 +54,15 @@ namespace expr
 			return "";
 		}
 
-		std::string toStrOpen(const BracketT v) const
-		{
-			if (v == BracketT::standart) return "(";
-			if (v == BracketT::whole) return "[";
-			if (v == BracketT::fract) return "{";
-			if (v == BracketT::modul) return "<";
-			return "";
-		}
-		std::string toStrClose(const BracketT v) const
-		{
-			if (v == BracketT::standart) return ")";
-			if (v == BracketT::whole) return "]";
-			if (v == BracketT::fract) return "}";
-			if (v == BracketT::modul) return ">";
-			return "";
-		}
-		BracketT toBracket(const char c) const
-		{
-			if (c == '[' || c == ']') return BracketT::whole;
-			if (c == '{' || c == '}') return BracketT::fract;
-			if (c == '<' || c == '>') return BracketT::modul;
-			return BracketT::standart;
-		}
 		char oppositeBracket(const char c) const
 		{
-			if (c == '(')return ')';
-			if (c == '[')return ']';
-			if (c == '{')return '}';
-			if (c == '<')return '>';
-			if (c == ')')return '(';
-			if (c == ']')return '[';
-			if (c == '}')return '{';
-			if (c == '>')return '<';
+			if (c == '(') return ')';
+			if (c == ')') return '(';
 			return c;
 		}
 
 		const TypeOfType toTOT(const std::string& s, char& id) const
 		{
-			if (s[0] == '(') return (id = static_cast<char>(BracketT::standart)), TypeOfType::bracket;
-			if (s[0] == '[') return (id = static_cast<char>(BracketT::whole)), TypeOfType::bracket;
-			if (s[0] == '{') return (id = static_cast<char>(BracketT::fract)), TypeOfType::bracket;
-			if (s[0] == '<') return (id = static_cast<char>(BracketT::modul)), TypeOfType::bracket;
 			if (auto iter = _map.find(s); iter != _map.end())
 			{
 				id = iter->second.id;

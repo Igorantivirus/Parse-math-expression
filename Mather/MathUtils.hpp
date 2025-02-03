@@ -63,22 +63,13 @@ namespace expr
 		factorial
 	};
 
-	enum class BracketT : char
-{
-		standart = 0,
-		whole,
-		fract,
-		modul
-	};
-
 	enum class TypeOfType : char
 	{
 		none = 0,
 		action = 1,
 		func = 2,
 		tFunc = 3,
-		pFunc = 4,
-		bracket = 5
+		pFunc = 4
 	};
 
 	namespace solver
@@ -146,20 +137,6 @@ namespace expr
 			case PostfixFunctionT::degree: return worker.toDegree(v);
 			case PostfixFunctionT::radian: return worker.toRadian(v);
 			case PostfixFunctionT::factorial: return worker.factorial(v);
-			default: return worker.getNan();
-			}
-			return worker.getNan();
-		}
-
-		template<typename Complex>
-		Complex solve(const Complex& v, const BracketT type) {
-			mathWorker::MathWorker<Complex> worker;
-			switch (type)
-			{
-			case BracketT::standart: return v;
-			case BracketT::whole: return worker.floor(v);
-			case BracketT::fract: return v - worker.floor(v);
-			case BracketT::modul: return worker.abs(v);
 			default: return worker.getNan();
 			}
 			return worker.getNan();

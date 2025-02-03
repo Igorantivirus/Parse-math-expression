@@ -49,8 +49,6 @@ namespace expr
 				{
 					if (str.size() < 3)
 						throw ParseException("Empty bracket", ParseException::ErrorT::brackets);
-					BracketT brk = mconverter.toBracket(str[0]);
-					res.setBracket(brk);
 					str.pop_back();
 					str.erase(str.begin());
 				}
@@ -66,21 +64,24 @@ namespace expr
 				mathWorker::MathWorker<Complex> worker;
 				for (size_t i = 0; i < tkns.size(); ++i)
 				{
+					if (tkns[i].empty())
+						throw ParseException("Empty noken.");
 					if (parseFuncs::isNum(tkns[i]))
 					{
 						Value<Complex> prv = worker.toComplex(tkns[i]);
 						fillAction(tkns, i, expr, prv);
 						continue;
 					}
-					char id = 0;
-					TypeOfType type = mconverter.toTOT(tkns[i], id);
-					if (type == TypeOfType::bracket)
+					if (tkns[i][0] == '(')
 					{
 						Expression<Complex> pre;
 						strParse(tkns[i], pre);
 						fillAction(tkns, i, expr, pre);
+						continue;
 					}
-					else if (type == TypeOfType::action)
+					char id = 0;
+					TypeOfType type = mconverter.toTOT(tkns[i], id);
+					if (type == TypeOfType::action)
 					{
 						if (id == static_cast<char>(ActionT::minus))
 						{
