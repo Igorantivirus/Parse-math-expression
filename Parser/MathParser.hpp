@@ -13,7 +13,9 @@ namespace expr
 
 			Expression<Complex> parse(std::string str) const
 			{
-				preproc(str);
+				if (!isGoodBrackets(str))
+					throw ParseException("Brackets are not good", ParseException::ErrorT::brackets);
+				mconverter.replaceConstants(str);
 
 				std::vector<std::string> tokens;
 				tok.tokenizer(str, tokens);
@@ -27,14 +29,6 @@ namespace expr
 		private:
 
 			Tokenizer tok;
-
-		private:
-
-			void preproc(std::string& str) const
-			{
-				if (!isGoodBrackets(str))
-					throw ParseException("Brackets are not good", ParseException::ErrorT::brackets);
-			}
 
 		private:
 

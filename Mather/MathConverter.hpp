@@ -72,6 +72,12 @@ namespace expr
 			return _constants;
 		}
 
+		void replaceConstants(std::string& str) const
+		{
+			for (const auto& [key, value] : _constants)
+				replaceAll(str, key, value);
+		}
+
 	private:
 
 		std::map<std::string, std::pair<char, MathBase::MathType>> _map;
@@ -110,6 +116,19 @@ namespace expr
 				if (value.second == tot && value.first == v)
 					return key;
 			return "";
+		}
+
+		void replaceAll(std::string& str, const std::string& oldS, const std::string& newS) const
+		{
+			const size_t s1 = oldS.size();
+			const size_t s2 = newS.size();
+			size_t ind;
+			size_t last = 0;
+			while ((ind = str.find(oldS, last)) != std::string::npos)
+			{
+				str.replace(ind, s1, newS);
+				last = ind + s2;
+			}
 		}
 
 	};

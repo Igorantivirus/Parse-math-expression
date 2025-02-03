@@ -135,17 +135,4 @@ namespace expr
 
 	}
 
-	void replaceAll(std::string& str, const std::string& oldS, const std::string& newS) 
-	{
-		const size_t s1 = oldS.size();
-		const size_t s2 = newS.size();
-		size_t ind;
-		size_t last = 0;
-		while ((ind = str.find(oldS, last)) != std::string::npos)
-		{
-			str.replace(ind, s1, newS);
-			last = ind + s2;
-		}
-	}
-
 }
