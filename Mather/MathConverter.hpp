@@ -5,15 +5,8 @@
 namespace expr
 {
 
-	class MathConverter {
-	public:
-
-		using Ñouple = struct
-		{
-			char id;
-			MathBase::MathType type;
-		};
-
+	class MathConverter
+	{
 	public:
 		MathConverter(const std::string& path)
 		{
@@ -68,8 +61,8 @@ namespace expr
 		{
 			if (auto iter = _map.find(s); iter != _map.end())
 			{
-				id = iter->second.id;
-				return iter->second.type;
+				id = iter->second.first;
+				return iter->second.second;
 			}
 			return MathBase::MathType::none;
 		}
@@ -81,7 +74,7 @@ namespace expr
 
 	private:
 
-		std::map<std::string, Ñouple> _map;
+		std::map<std::string, std::pair<char, MathBase::MathType>> _map;
 		std::map<std::string, std::string> _constants;
 
 	private:
@@ -105,7 +98,7 @@ namespace expr
 				else
 				{
 					char id = std::stoi(prArr[2]);
-					_map.insert(std::make_pair(prArr[0], Ñouple{ id, static_cast<MathBase::MathType>(idTOT) }));
+					_map.insert(std::make_pair(prArr[0], std::make_pair( id, static_cast<MathBase::MathType>(idTOT) )));
 				}
 			}
 			file.close();
@@ -114,7 +107,7 @@ namespace expr
 		std::string toStrTempl(const MathBase::MathType tot, const char v) const
 		{
 			for (auto const& [key, value] : _map)
-				if (value.type == tot && value.id == v)
+				if (value.second == tot && value.first == v)
 					return key;
 			return "";
 		}
