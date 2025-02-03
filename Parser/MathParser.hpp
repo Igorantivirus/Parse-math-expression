@@ -69,21 +69,20 @@ namespace expr
 					if (parseFuncs::isNum(tkns[i]))
 					{
 						Value<Complex> prv = worker.toComplex(tkns[i]);
-						fillAction(tkns, i, expr, prv);
+						fillPostfix(tkns, i, expr, prv);
 						continue;
 					}
 					if (tkns[i][0] == '(')
 					{
 						Expression<Complex> pre;
 						strParse(tkns[i], pre);
-						fillAction(tkns, i, expr, pre);
+						fillPostfix(tkns, i, expr, pre);
 						continue;
 					}
-					char id = 0;
-					TypeOfType type = mconverter.toTOT(tkns[i], id);
-					if (type == TypeOfType::action)
+					if (mconverter.isAction(tkns[i]))
 					{
-						if (id == static_cast<char>(ActionT::minus))
+						ActionT act = static_cast<ActionT>(tkns[i][0]);
+						if (act == ActionT::minus)
 						{
 							Value<Complex> minus(Complex(-1), ActionT::multiply);
 							expr.add(minus);
@@ -92,9 +91,11 @@ namespace expr
 						else
 							throw ParseException("Double arithmetic operation", ParseException::ErrorT::action);
 					}
-					else if (type == TypeOfType::func)
+					char id = 0;
+					MathBase::MathType type = mconverter.toTOT(tkns[i], id);
+					if (type == MathBase::MathType::function)
 						fillFunction(tkns, i, expr, id);
-					else if (type == TypeOfType::tFunc)
+					else if (type == MathBase::MathType::twoFunction)
 						fillTwoFunction(tkns, i, expr, id);
 					else
 						throw ParseException("Unknown type of token: \"" + tkns[i] + '\"', ParseException::ErrorT::word);
@@ -103,29 +104,31 @@ namespace expr
 
 		private:
 
-			void fillAction(const std::vector<std::string>& tkns, size_t& i, Expression<Complex>& expr, MathBase& value) const
+			void fillPostfix(const std::vector<std::string>& tkns, size_t& i, Expression<Complex>& expr, MathBase& value) const
 			{
 				if (i + 1 < tkns.size())
 				{
-					char id = 0;
-					TypeOfType type = mconverter.toTOT(tkns[i + 1], id);
-
-					if (type == TypeOfType::action)
+					if (mconverter.isAction(tkns[i + 1]))
 					{
-						value.setAct(static_cast<ActionT>(id));
+						value.setAct(static_cast<ActionT>(tkns[i + 1][0]));
 						++i;
-					}
-					else if (type == TypeOfType::pFunc)
-					{
-						++i;
-						PostfixFunction<Complex> f;
-						f.setType(static_cast<PostfixFunctionT>(id));
-						f.setArgument(value);
-						fillAction(tkns, i, expr, f);
-						return;
 					}
 					else
-						value.setAct(ActionT::hiddMultiply);
+					{
+						char id = 0;
+						MathBase::MathType type = mconverter.toTOT(tkns[i + 1], id);
+						if (type == MathBase::MathType::postfixFunction)
+						{
+							++i;
+							PostfixFunction<Complex> f;
+							f.setType(static_cast<PostfixFunctionT>(id));
+							f.setArgument(value);
+							fillPostfix(tkns, i, expr, f);
+							return;
+						}
+						else
+							value.setAct(ActionT::hiddMultiply);
+					}
 				}
 				expr.add(value);
 			}
@@ -140,7 +143,7 @@ namespace expr
 				Expression<Complex> pr;
 				strParse(tkns[i], pr);
 				prf.setArgument(pr);
-				fillAction(tkns, i, expr, prf);
+				fillPostfix(tkns, i, expr, prf);
 			}
 
 			void fillTwoFunction(const std::vector<std::string>& tkns, size_t& i, Expression<Complex>& expr, const char id) const
@@ -155,7 +158,7 @@ namespace expr
 				strParse(tkns[i], pr2);
 				f.setArgument(pr2);
 				f.setSpecilAgrument(pr1);
-				fillAction(tkns, i, expr, f);
+				fillPostfix(tkns, i, expr, f);
 			}
 
 		};

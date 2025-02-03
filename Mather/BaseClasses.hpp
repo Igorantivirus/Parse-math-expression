@@ -7,7 +7,7 @@ namespace expr
 
 	class MathBase
 	{
-	protected:
+	public:
 
 		enum class MathType : char
 		{
