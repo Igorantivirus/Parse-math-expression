@@ -118,6 +118,7 @@ namespace expr
 				{
 					value.setAct(static_cast<ActionT>(id));
 					++i;
+					expr.add(value);
 					return;
 				}
 
