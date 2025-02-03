@@ -29,6 +29,7 @@ namespace expr
 		private:
 
 			Tokenizer tok;
+			mathWorker::MathWorker<Complex> worker;
 
 		private:
 
@@ -52,7 +53,6 @@ namespace expr
 			{
 				if (tkns.empty())
 					throw ParseException("Empty string");
-				mathWorker::MathWorker<Complex> worker;
 				for (size_t i = 0; i < tkns.size(); ++i)
 				{
 					if (tkns[i].empty())
