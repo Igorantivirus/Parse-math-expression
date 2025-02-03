@@ -16,7 +16,8 @@ namespace expr
 			function,
 			postfixFunction,
 			twoFunction,
-			expression
+			expression,
+			variable
 		};
 
 		virtual const MathType getMT() const = 0;
