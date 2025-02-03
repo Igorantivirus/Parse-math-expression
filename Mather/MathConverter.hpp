@@ -36,24 +36,15 @@ namespace expr
 		}
 		const std::string toStr(const FunctionT v) const
 		{
-			for (auto const& [key, value] : _map)
-				if (value.type == TypeOfType::func && value.id == static_cast<char>(v))
-					return key;
-			return "";
+			return toStrTempl(TypeOfType::func, static_cast<char>(v));
 		}
 		const std::string toStr(const TwoFunctionT v) const
 		{
-			for (auto const& [key, value] : _map)
-				if (value.type == TypeOfType::tFunc && value.id == static_cast<char>(v))
-					return key;
-			return "";
+			return toStrTempl(TypeOfType::tFunc, static_cast<char>(v));
 		}
 		const std::string toStr(const PostfixFunctionT v) const
 		{
-			for (auto const& [key, value] : _map)
-				if (value.type == TypeOfType::pFunc && value.id == static_cast<char>(v))
-					return key;
-			return "";
+			return toStrTempl(TypeOfType::pFunc, static_cast<char>(v));
 		}
 
 		char oppositeBracket(const char c) const
@@ -113,6 +104,14 @@ namespace expr
 				}
 			}
 			file.close();
+		}
+
+		std::string toStrTempl(const TypeOfType tot, const char v) const
+		{
+			for (auto const& [key, value] : _map)
+				if (value.type == tot && value.id == v)
+					return key;
+			return "";
 		}
 
 	};
