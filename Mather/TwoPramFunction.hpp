@@ -28,6 +28,8 @@ namespace expr
 				return "\\log_{" + sarg + "}{(" + arg + ")}";
 			if (_type == TwoFunctionT::root)
 				return "\\sqrt[" + sarg + "]{" + arg + "}";
+			if(_type == TwoFunctionT::pow)
+				return "{" + arg + "}^{" + sarg + "}";
 			return "nan";
 		}
 

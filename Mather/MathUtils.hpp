@@ -9,27 +9,25 @@
 #include"../MathWorker/MathWorker.hpp"
 #include"../FileHeaders/FileReader.hpp"
 
-#define BD_TD_FILE "bd.td"
+#define BD_TD_FILE "func_dict.td"
 
 namespace expr
 {
 
 	enum class ActionT : char
 	{
-		none = 0,
-		plus,
-		minus,
-		multiply,
-		div,
-		wholeDiv,
-		mod,
-		pow,
-		hiddMultiply
+		none = -1,
+		plus = '+',
+		minus = '-',
+		multiply = '*',
+		div = '/',
+		mod = '%',
+		hiddMultiply = '\0'
 	};
 
 	enum class FunctionT : char
 	{
-		none = 0,
+		none = -1,
 
 		sqrt,
 		ln,
@@ -50,25 +48,18 @@ namespace expr
 
 	enum class TwoFunctionT : char
 	{
-		none = 0,
+		none = -1,
 		log,
-		root
+		root,
+		pow
 	};
 
 	enum class PostfixFunctionT : char
 {
-		none = 0,
+		none = -1,
 		degree,
 		radian,
 		factorial
-	};
-
-	enum class BracketT : char
-{
-		standart = 0,
-		whole,
-		fract,
-		modul
 	};
 
 	enum class TypeOfType : char
@@ -94,9 +85,7 @@ namespace expr
 			case ActionT::multiply: return arg1 * arg2;
 			case ActionT::hiddMultiply: return arg1 * arg2;
 			case ActionT::div: return arg1 / arg2;
-			case ActionT::wholeDiv: return worker.floor(arg1 / arg2);
 			case ActionT::mod: return worker.fmod(arg1, arg2);
-			case ActionT::pow: return worker.pow(arg1, arg2);
 			default: return worker.getNan();
 			}
 			return worker.getNan();
@@ -133,6 +122,7 @@ namespace expr
 			{
 			case TwoFunctionT::log: return worker.log(sarg, arg);
 			case TwoFunctionT::root: return worker.nrt(arg, sarg);
+			case TwoFunctionT::pow: return worker.pow(arg, sarg);
 			default: return worker.getNan();
 			}
 			return worker.getNan();
@@ -146,20 +136,6 @@ namespace expr
 			case PostfixFunctionT::degree: return worker.toDegree(v);
 			case PostfixFunctionT::radian: return worker.toRadian(v);
 			case PostfixFunctionT::factorial: return worker.factorial(v);
-			default: return worker.getNan();
-			}
-			return worker.getNan();
-		}
-
-		template<typename Complex>
-		Complex solve(const Complex& v, const BracketT type) {
-			mathWorker::MathWorker<Complex> worker;
-			switch (type)
-			{
-			case BracketT::standart: return v;
-			case BracketT::whole: return worker.floor(v);
-			case BracketT::fract: return v - worker.floor(v);
-			case BracketT::modul: return worker.abs(v);
 			default: return worker.getNan();
 			}
 			return worker.getNan();
@@ -215,49 +191,15 @@ namespace expr
 					return key;
 			return "";
 		}
-
-		std::string toStrOpen(const BracketT v) const
-		{
-			if (v == BracketT::standart) return "(";
-			if (v == BracketT::whole) return "[";
-			if (v == BracketT::fract) return "{";
-			if (v == BracketT::modul) return "<";
-			return "";
-		}
-		std::string toStrClose(const BracketT v) const
-		{
-			if (v == BracketT::standart) return ")";
-			if (v == BracketT::whole) return "]";
-			if (v == BracketT::fract) return "}";
-			if (v == BracketT::modul) return ">";
-			return "";
-		}
-		BracketT toBracket(const char c) const
-		{
-			if (c == '[' || c == ']') return BracketT::whole;
-			if (c == '{' || c == '}') return BracketT::fract;
-			if (c == '<' || c == '>') return BracketT::modul;
-			return BracketT::standart;
-		}
 		char oppositeBracket(const char c) const
 		{
 			if (c == '(')return ')';
-			if (c == '[')return ']';
-			if (c == '{')return '}';
-			if (c == '<')return '>';
 			if (c == ')')return '(';
-			if (c == ']')return '[';
-			if (c == '}')return '{';
-			if (c == '>')return '<';
 			return c;
 		}
 
 		const TypeOfType toTOT(const std::string& s, char& id) const
 		{
-			if (s[0] == '(') return (id = static_cast<char>(BracketT::standart)), TypeOfType::bracket;
-			if (s[0] == '[') return (id = static_cast<char>(BracketT::whole)), TypeOfType::bracket;
-			if (s[0] == '{') return (id = static_cast<char>(BracketT::fract)), TypeOfType::bracket;
-			if (s[0] == '<') return (id = static_cast<char>(BracketT::modul)), TypeOfType::bracket;
 			if (auto iter = _map.find(s); iter != _map.end())
 			{
 				id = iter->second.id;

@@ -25,6 +25,10 @@ namespace expr
 			{
 				return c == ')' || c == '}' || c == '>' || c == ']';
 			}
+			bool isAction(const char c)
+			{
+				return c == '+' || c == '-' || c == '*' || c == '/' || c == '%';
+			}
 			bool isWord(const char c)
 			{
 				return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');

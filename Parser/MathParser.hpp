@@ -14,7 +14,8 @@ namespace expr
 
 			Expression<Complex> parse(std::string str) const
 			{
-				preproc(str);
+				if(!isGoodBrackets(str))
+					throw ParseException("Brackets are not good", ParseException::ErrorT::brackets);
 
 				std::vector<std::string> tokens;
 				tok.tokenizer(str, tokens);
@@ -31,12 +32,19 @@ namespace expr
 
 		private:
 
-			void preproc(std::string& str) const
+			bool isGoodBrackets(const std::string& str) const
 			{
-				Preprocessor proc;
-				proc.fullPreprocess(str);
-				if (!proc.isGoodBrackets(str))
-					throw ParseException("Brackets are not good", ParseException::ErrorT::brackets);
+				std::stack<char> s;
+				for (const auto& i : str)
+					if (parseFuncs::isOpenBracket(i))
+						s.push(i);
+					else if (parseFuncs::isCloseBracket(i))
+					{
+						if (s.empty() || s.top() != mconverter.oppositeBracket(i))
+							return false;
+						s.pop();
+					}
+				return s.empty();
 			}
 
 		private:
@@ -45,12 +53,10 @@ namespace expr
 			{
 				if (str.empty())
 					throw ParseException("Empty string");
-				if (parseFuncs::isOpenBracket(str[0]))
+				if (str[0] == '(')
 				{
 					if (str.size() < 3)
 						throw ParseException("Empty bracket", ParseException::ErrorT::brackets);
-					BracketT brk = mconverter.toBracket(str[0]);
-					res.setBracket(brk);
 					str.pop_back();
 					str.erase(str.begin());
 				}
@@ -66,32 +72,30 @@ namespace expr
 				mathWorker::MathWorker<Complex> worker;
 				for (size_t i = 0; i < tkns.size(); ++i)
 				{
+					if(tkns[i].empty())
+						throw ParseException("Empty token.");
 					if (parseFuncs::isNum(tkns[i]))
 					{
 						Value<Complex> prv = worker.toComplex(tkns[i]);
 						fillAction(tkns, i, expr, prv);
 						continue;
 					}
-					char id = 0;
-					TypeOfType type = mconverter.toTOT(tkns[i], id);
-					if (type == TypeOfType::bracket)
+					else if (tkns[i][0] == '(')
 					{
 						Expression<Complex> pre;
 						strParse(tkns[i], pre);
 						fillAction(tkns, i, expr, pre);
+						continue;
 					}
-					else if (type == TypeOfType::action)
+					else if (tkns[i][0] == '-')
 					{
-						if (id == static_cast<char>(ActionT::minus))
-						{
-							Value<Complex> minus(Complex(-1), ActionT::multiply);
-							expr.add(minus);
-							continue;
-						}
-						else
-							throw ParseException("Double arithmetic operation", ParseException::ErrorT::action);
+						Value<Complex> minus(Complex(-1), ActionT::multiply);
+						expr.add(minus);
+						continue;
 					}
-					else if (type == TypeOfType::func)
+					char id = 0;
+					TypeOfType type = mconverter.toTOT(tkns[i], id);
+					if (type == TypeOfType::func)
 						fillFunction(tkns, i, expr, id);
 					else if (type == TypeOfType::tFunc)
 						fillTwoFunction(tkns, i, expr, id);
@@ -104,29 +108,39 @@ namespace expr
 
 			void fillAction(const std::vector<std::string>& tkns, size_t& i, Expression<Complex>& expr, MathBase& value) const
 			{
-				if (i + 1 < tkns.size())
+				if (i + 1 >= tkns.size())
 				{
-					char id = 0;
-					TypeOfType type = mconverter.toTOT(tkns[i + 1], id);
-
-					if (type == TypeOfType::action)
-					{
-						value.setAct(static_cast<ActionT>(id));
-						++i;
-					}
-					else if (type == TypeOfType::pFunc)
-					{
-						++i;
-						PostfixFunction<Complex> f;
-						f.setType(static_cast<PostfixFunctionT>(id));
-						f.setArgument(value);
-						fillAction(tkns, i, expr, f);
-						return;
-					}
-					else
-						value.setAct(ActionT::hiddMultiply);
+					expr.add(value);
+					return;
 				}
-				expr.add(value);
+				char id = tkns[i + 1][0];
+				if (parseFuncs::isAction(id))
+				{
+					value.setAct(static_cast<ActionT>(id));
+					++i;
+					return;
+				}
+
+
+				/*char id = 0;
+				TypeOfType type = mconverter.toTOT(tkns[i + 1], id);
+
+				if (type == TypeOfType::action)
+				{
+					value.setAct(static_cast<ActionT>(id));
+					++i;
+				}
+				else if (type == TypeOfType::pFunc)
+				{
+					++i;
+					PostfixFunction<Complex> f;
+					f.setType(static_cast<PostfixFunctionT>(id));
+					f.setArgument(value);
+					fillAction(tkns, i, expr, f);
+					return;
+				}
+				else
+					value.setAct(ActionT::hiddMultiply);*/
 			}
 
 			void fillFunction(const std::vector<std::string>& tkns, size_t& i, Expression<Complex>& expr, const char id) const 
