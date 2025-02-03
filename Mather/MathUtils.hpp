@@ -51,7 +51,8 @@ namespace expr
 	{
 		none = 0,
 		log,
-		root
+		root,
+		pow,
 	};
 
 	enum class PostfixFunctionT : char
@@ -113,6 +114,7 @@ namespace expr
 			{
 			case TwoFunctionT::log: return worker.log(sarg, arg);
 			case TwoFunctionT::root: return worker.nrt(arg, sarg);
+			case TwoFunctionT::pow: return worker.pow(arg, sarg);
 			default: return worker.getNan();
 			}
 			return worker.getNan();
