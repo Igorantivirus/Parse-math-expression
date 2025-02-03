@@ -20,6 +20,8 @@ namespace expr
 		{
 			std::string arg = _argument == nullptr ? "nan" : _argument->toStr();
 			std::string sarg = _specialArg == nullptr ? "nan" : _specialArg->toStr();
+			if (_type == TwoFunctionT::pow)
+				return arg + '^' + sarg;
 			return mconverter.toStr(_type) + '(' + sarg + "," + arg + ')';
 		}
 		const std::string toMathJaxStr() const override {
@@ -29,6 +31,8 @@ namespace expr
 				return "\\log_{" + sarg + "}{(" + arg + ")}";
 			if (_type == TwoFunctionT::root)
 				return "\\sqrt[" + sarg + "]{" + arg + "}";
+			if (_type == TwoFunctionT::root)
+				return "\\{" + arg + "}^{" + sarg + "}";
 			return "nan";
 		}
 
