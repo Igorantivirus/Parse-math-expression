@@ -14,8 +14,8 @@ namespace expr
 			none = 0,
 			value,
 			function,
-			postfixFunction,
 			twoFunction,
+			postfixFunction,
 			expression
 		};
 
