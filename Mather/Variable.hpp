@@ -32,6 +32,10 @@ namespace expr
 			mathWorker::MathWorker<Complex> worker;
 			return std::make_unique<Value<Complex>>(Value<Complex>(worker.getNan()));
 		}
+		MathBasePtr getProcessedEpression() const override
+		{
+			return std::make_unique<Variable>(*this);
+		}
 		MathBasePtr copy() const override
 		{
 			return std::make_unique<Variable>(*this);

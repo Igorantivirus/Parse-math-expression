@@ -37,6 +37,16 @@ namespace expr
 			Value<Complex> sarg = Value<Complex>::convertProcessed(*_specialArg);
 			return std::make_unique<Value<Complex>>(Value(solver::solve(arg.getValue(), sarg.getValue(), _type), _act));
 		}
+		MathBasePtr getProcessedEpression() const override
+		{
+			MathBasePtr myArg1 = _argument->getProcessedEpression();
+			MathBasePtr myArg2 = _specialArg->getProcessedEpression();
+
+			TwoPramFunction res(_act);
+			res._argument = std::move(myArg1);
+			res._specialArg = std::move(myArg2);
+			return res->copy();
+		}
 		MathBasePtr copy() const override
 		{
 			return std::make_unique<TwoPramFunction>(*this);

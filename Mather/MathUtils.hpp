@@ -81,6 +81,28 @@ namespace expr
 		bracket = 5
 	};
 
+	FunctionT getOpposite(const FunctionT t)
+	{
+		static std::map<FunctionT, FunctionT> map =
+		{
+			{FunctionT::sin, FunctionT::arcsin},
+			{FunctionT::cos, FunctionT::arccos},
+			{FunctionT::tg, FunctionT::arctg},
+			{FunctionT::ctg, FunctionT::arcctg},
+			{FunctionT::exp, FunctionT::ln}
+		};
+
+		for (const auto& [key, value] : map)
+		{
+			if (t == key)
+				return value;
+			else if (t == value)
+				return key;
+		}
+		return FunctionT::none;
+
+	}
+
 	namespace solver
 	{
 

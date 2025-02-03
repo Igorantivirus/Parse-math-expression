@@ -93,6 +93,19 @@ namespace expr
 
 			return std::make_unique<Value<Complex>>(Value<Complex>(solver::solve<Complex>(values[0].getValue(), _type), _act));
 		}
+		MathBasePtr getProcessedEpression() const override
+		{
+			std::vector<MathBasePtr> newExpr;
+			for (const auto& i : _expression)
+				if (i != nullptr)
+					values.push_back(std::move(i->getProcessedEpression()));
+
+
+
+
+
+
+		}
 		MathBasePtr copy() const override
 		{
 			return std::make_unique<Expression>(*this);
@@ -170,6 +183,14 @@ namespace expr
 					vls.insert(vls.begin() + i, Value(prv, act));
 					--i;
 				}
+			}
+		}
+
+		void processExprPow(std::vector<MathBasePtr>& newExpr)
+		{
+			for (size_t i = 0; i < newExpr.size(); ++i)
+			{
+
 			}
 		}
 

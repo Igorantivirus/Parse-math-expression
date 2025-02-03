@@ -34,6 +34,19 @@ namespace expr
 			Value v = Value<Complex>::convertProcessed(*_argument);
 			return std::make_unique<Value<Complex>>(Value(solver::solve(v.getValue(), _type), _act));
 		}
+		MathBasePtr getProcessedEpression() const override
+		{
+			MathBasePtr myArg = _argument->getProcessedEpression();
+			if (myArg->getMT() == MathBase::MathType::function)
+			{
+				StanartFunction arg = *dynamic_cast<StanartFunction*>(myArg.get());
+				if (getOpposite(arg._type) != FunctionT::none)
+					return arg._argument->copy();
+			}
+			StanartFunction res(_act);
+			res._argument = std::move(myArg);
+			return res->copy();
+		}
 		MathBasePtr copy() const override
 		{
 			return std::make_unique<StanartFunction>(*this);

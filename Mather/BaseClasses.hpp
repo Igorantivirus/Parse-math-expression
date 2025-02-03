@@ -32,6 +32,7 @@ namespace expr
 		virtual const std::string toMathJaxStr() const = 0;
 
 		virtual std::unique_ptr<MathBase> getProcessedValue() const = 0;
+		virtual std::unique_ptr<MathBase> getProcessedEpression() const = 0;
 		virtual std::unique_ptr<MathBase> copy() const = 0;
 
 		ActionT getAct() const

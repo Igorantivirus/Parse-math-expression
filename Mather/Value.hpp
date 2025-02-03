@@ -29,6 +29,10 @@ namespace expr
 		{
 			return std::make_unique<Value>(*this);
 		}
+		MathBasePtr getProcessedEpression() const override
+		{
+			return std::make_unique<Value>(*this);
+		}
 		MathBasePtr copy() const override
 		{
 			return std::make_unique<Value>(*this);
