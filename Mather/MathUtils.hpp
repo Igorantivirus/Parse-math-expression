@@ -17,14 +17,13 @@ namespace expr
 	enum class ActionT : char
 	{
 		none = 0,
-		plus,
-		minus,
-		multiply,
-		div,
-		wholeDiv,
-		mod,
-		pow,
-		hiddMultiply
+		plus = '+',
+		minus = '-',
+		multiply = '*',
+		div = '/',
+		mod = '%',
+		pow = '^',
+		hiddMultiply = '\x1D'
 	};
 
 	enum class FunctionT : char
@@ -85,7 +84,6 @@ namespace expr
 			case ActionT::multiply: return arg1 * arg2;
 			case ActionT::hiddMultiply: return arg1 * arg2;
 			case ActionT::div: return arg1 / arg2;
-			case ActionT::wholeDiv: return worker.floor(arg1 / arg2);
 			case ActionT::mod: return worker.fmod(arg1, arg2);
 			case ActionT::pow: return worker.pow(arg1, arg2);
 			default: return worker.getNan();

@@ -85,7 +85,7 @@ namespace expr
 
 			processAt(values, { ActionT::hiddMultiply });
 			processAt(values, { ActionT::pow });
-			processAt(values, { ActionT::multiply, ActionT::div, ActionT::wholeDiv, ActionT::mod });
+			processAt(values, { ActionT::multiply, ActionT::div, ActionT::mod });
 			processAt(values, { ActionT::plus, ActionT::minus });
 
 			return std::make_unique<Value<Complex>>(Value<Complex>(values[0].getValue(), _act));

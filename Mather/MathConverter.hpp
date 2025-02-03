@@ -25,12 +25,14 @@ namespace expr
 			readMap(str);
 		}
 
+		bool isAction(const char c) const
+		{
+			return c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '^';
+		}
+
 		const std::string toStr(const ActionT v) const
 		{
-			for (auto const& [key, value] : _map)
-				if (value.type == TypeOfType::action && value.id == static_cast<char>(v))
-					return key;
-			return "";
+			return std::string(1, static_cast<char>(v));
 		}
 		const std::string toStr(const FunctionT v) const
 		{
@@ -63,6 +65,11 @@ namespace expr
 
 		const TypeOfType toTOT(const std::string& s, char& id) const
 		{
+			if (s.size() == 1 && isAction(s[0]))
+			{
+				id = s[0];
+				return TypeOfType::action;
+			}
 			if (auto iter = _map.find(s); iter != _map.end())
 			{
 				id = iter->second.id;
