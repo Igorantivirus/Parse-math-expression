@@ -94,10 +94,10 @@ namespace expr
 						continue;
 					}
 					char id = 0;
-					TypeOfType type = mconverter.toTOT(tkns[i], id);
-					if (type == TypeOfType::func)
+					MathBase::MathType type = mconverter.toTOT(tkns[i], id);
+					if (type == MathBase::MathType::function)
 						fillFunction(tkns, i, expr, id);
-					else if (type == TypeOfType::tFunc)
+					else if (type == MathBase::MathType::twoFunction)
 						fillTwoFunction(tkns, i, expr, id);
 					else
 						throw ParseException("Unknown type of token: \"" + tkns[i] + '\"', ParseException::ErrorT::word);

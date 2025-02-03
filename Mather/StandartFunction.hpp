@@ -1,6 +1,7 @@
 #pragma once
 
 #include"BaseClasses.hpp"
+#include"MathConverter.hpp"
 #include"Value.hpp"
 
 namespace expr
