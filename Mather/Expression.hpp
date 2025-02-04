@@ -38,7 +38,7 @@ namespace expr
 
 			for (auto& i : _expression)
 				if (i != nullptr)
-					res += i->toStr() + mconverter.toStr(i->getAct());
+					res += i->toStr() + MathConverter::singl().toStr(i->getAct());
 			
 			if (_expression.size() > 1)
 				res.push_back(')');
@@ -57,15 +57,15 @@ namespace expr
 				{
 					res += "\\frac{" + _expression[i]->toMathJaxStr() + "}{";
 					if (i + 1 < _expression.size())
-						res += _expression[i + 1]->toMathJaxStr() + '}' + mconverter.toStr(_expression[i + 1]->getAct());
+						res += _expression[i + 1]->toMathJaxStr() + '}' + MathConverter::singl().toStr(_expression[i + 1]->getAct());
 					else
 						res += '}';
 					++i;
 				}
 				else if (i - 1 < _expression.size() && _expression[i - 1]->getAct() == ActionT::pow)
-					res += '{' + _expression[i]->toMathJaxStr() + '}' + mconverter.toStr(_expression[i]->getAct());
+					res += '{' + _expression[i]->toMathJaxStr() + '}' + MathConverter::singl().toStr(_expression[i]->getAct());
 				else
-					res += _expression[i]->toMathJaxStr() + mconverter.toStr(_expression[i]->getAct());
+					res += _expression[i]->toMathJaxStr() + MathConverter::singl().toStr(_expression[i]->getAct());
 			}
 
 			if (_expression.size() > 1)

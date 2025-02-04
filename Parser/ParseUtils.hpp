@@ -23,7 +23,7 @@ namespace expr
 					s.push(i);
 				else if (i == ')')
 				{
-					if (s.empty() || s.top() != mconverter.oppositeBracket(i))
+					if (s.empty() || s.top() != MathConverter::singl().oppositeBracket(i))
 						return false;
 					s.pop();
 				}
@@ -104,7 +104,7 @@ namespace expr
 						tokens.push_back(expression.substr(last, ind - last));
 						continue;
 					}
-					while (mconverter.isNum(expression[++ind])) {}
+					while (MathConverter::singl().isNum(expression[++ind])) {}
 					tokens.push_back(expression.substr(last, ind - last));
 				}
 				tokens.push_back(expression.substr(last));

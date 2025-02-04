@@ -2,16 +2,22 @@
 
 #include"MathUtils.hpp"
 
+#define BD_TD_FILE "bd.td"
+
 namespace expr
 {
 
 	class MathConverter
 	{
 	public:
-		MathConverter(const std::string& path)
+		
+		static MathConverter& singl()
 		{
-			readMap(path);
+			static MathConverter s(BD_TD_FILE);
+			return s;
 		}
+
+	public:
 
 		void reopen(const std::string& str)
 		{
@@ -89,6 +95,11 @@ namespace expr
 
 	private:
 
+		MathConverter(const std::string& path)
+		{
+			readMap(path);
+		}
+
 		void readMap(const std::string& path)
 		{
 			_map.clear();
@@ -137,5 +148,4 @@ namespace expr
 
 	};
 
-	MathConverter mconverter(BD_TD_FILE);
 }

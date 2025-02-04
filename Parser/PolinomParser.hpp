@@ -39,7 +39,7 @@ namespace expr
 			void preproc(std::string& str) const
 			{
 				Preprocessor proc;
-				proc.constantEdding(mconverter.getConstantDictionary(), str);
+				proc.constantEdding(MathConverter::singl().getConstantDictionary(), str);
 				if (!proc.isGoodBrackets(str))
 					throw ParseException("Brackets are not good", ParseException::ErrorT::brackets);
 			}
@@ -131,7 +131,7 @@ namespace expr
 				return ActionT::hiddMultiply;*/
 				
 				char id = 0;
-				TypeOfType type = mconverter.toTOT(tkns[ind + 1], id);
+				TypeOfType type = MathConverter::singl().toTOT(tkns[ind + 1], id);
 
 				if (type == TypeOfType::action)
 				{

@@ -15,7 +15,7 @@ namespace expr
 			{
 				if (!isGoodBrackets(str))
 					throw ParseException("Brackets are not good", ParseException::ErrorT::brackets);
-				mconverter.replaceConstants(str);
+				MathConverter::singl().replaceConstants(str);
 
 				std::vector<std::string> tokens;
 				tok.tokenizer(str, tokens);
@@ -57,7 +57,7 @@ namespace expr
 				{
 					if (tkns[i].empty())
 						throw ParseException("Empty noken.");
-					if (mconverter.isNum(tkns[i]))
+					if (MathConverter::singl().isNum(tkns[i]))
 					{
 						Value<Complex> prv = worker.toComplex(tkns[i]);
 						fillPostfix(tkns, i, expr, prv);
@@ -70,7 +70,7 @@ namespace expr
 						fillPostfix(tkns, i, expr, pre);
 						continue;
 					}
-					if (mconverter.isAction(tkns[i]))
+					if (MathConverter::singl().isAction(tkns[i]))
 					{
 						ActionT act = static_cast<ActionT>(tkns[i][0]);
 						if (act == ActionT::minus)
@@ -83,7 +83,7 @@ namespace expr
 							throw ParseException("Double arithmetic operation", ParseException::ErrorT::action);
 					}
 					char id = 0;
-					MathBase::MathType type = mconverter.toTOT(tkns[i], id);
+					MathBase::MathType type = MathConverter::singl().toTOT(tkns[i], id);
 					if (type == MathBase::MathType::function)
 						fillFunction(tkns, i, expr, id);
 					else if (type == MathBase::MathType::twoFunction)
@@ -99,7 +99,7 @@ namespace expr
 			{
 				if (i + 1 < tkns.size())
 				{
-					if (mconverter.isAction(tkns[i + 1]))
+					if (MathConverter::singl().isAction(tkns[i + 1]))
 					{
 						value.setAct(static_cast<ActionT>(tkns[i + 1][0]));
 						++i;
@@ -107,7 +107,7 @@ namespace expr
 					else
 					{
 						char id = 0;
-						MathBase::MathType type = mconverter.toTOT(tkns[i + 1], id);
+						MathBase::MathType type = MathConverter::singl().toTOT(tkns[i + 1], id);
 						if (type == MathBase::MathType::postfixFunction)
 						{
 							++i;

@@ -20,14 +20,14 @@ namespace expr
 		const std::string toStr() const override
 		{
 			std::string arg = _argument == nullptr ? "nan" : _argument->toStr();
-			return mconverter.toStr(_type) + '(' + arg + ')';
+			return MathConverter::singl().toStr(_type) + '(' + arg + ')';
 		}
 		const std::string toMathJaxStr() const override
 		{
 			std::string arg = _argument == nullptr ? "nan" : _argument->toMathJaxStr();
 			if (_type == FunctionT::sqrt)
-				return "\\" + mconverter.toStr(_type) + '{' + arg + '}';
-			return "\\" + mconverter.toStr(_type) + '(' + arg + ')';
+				return "\\" + MathConverter::singl().toStr(_type) + '{' + arg + '}';
+			return "\\" + MathConverter::singl().toStr(_type) + '(' + arg + ')';
 		}
 
 		MathBasePtr getProcessedValue() const override

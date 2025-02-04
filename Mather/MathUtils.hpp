@@ -9,8 +9,6 @@
 #include"../MathWorker/MathWorker.hpp"
 #include"../FileHeaders/FileReader.hpp"
 
-#define BD_TD_FILE "bd.td"
-
 namespace expr
 {
 

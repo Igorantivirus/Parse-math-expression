@@ -22,7 +22,7 @@ namespace expr
 			std::string sarg = _specialArg == nullptr ? "nan" : _specialArg->toStr();
 			if (_type == TwoFunctionT::pow)
 				return arg + '^' + sarg;
-			return mconverter.toStr(_type) + '(' + sarg + "," + arg + ')';
+			return MathConverter::singl().toStr(_type) + '(' + sarg + "," + arg + ')';
 		}
 		const std::string toMathJaxStr() const override {
 			std::string arg = _argument == nullptr ? "nan" : _argument->toMathJaxStr();

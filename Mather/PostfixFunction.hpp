@@ -19,12 +19,12 @@ namespace expr
 		const std::string toStr() const override
 		{
 			std::string arg = _argument == nullptr ? "nan" : _argument->toStr();
-			return arg + mconverter.toStr(_type);
+			return arg + MathConverter::singl().toStr(_type);
 		}
 		const std::string toMathJaxStr() const override
 		{
 			std::string arg = _argument == nullptr ? "nan" : _argument->toMathJaxStr();
-			return arg + mconverter.toStr(_type);
+			return arg + MathConverter::singl().toStr(_type);
 		}
 
 		const PostfixFunctionT getType() const
