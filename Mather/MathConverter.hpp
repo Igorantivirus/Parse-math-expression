@@ -71,6 +71,10 @@ namespace expr
 		{
 			return _constants;
 		}
+		const std::map<std::string, std::pair<char, MathBase::MathType>>& getMap() const
+		{
+			return _map;
+		}
 
 		void replaceConstants(std::string& str) const
 		{
