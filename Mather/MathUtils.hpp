@@ -47,7 +47,10 @@ namespace expr
 		arcctg,
 
 		floor,
-		frac
+		frac,
+		sign,
+		real,
+		imag
 	};
 
 	enum class TwoFunctionT : char
@@ -106,6 +109,9 @@ namespace expr
 			case FunctionT::arcctg: return worker.arcctg(v);
 			case FunctionT::floor: return worker.floor(v);
 			case FunctionT::frac: return worker.fractional(v);
+			case FunctionT::sign: return v == Complex(0) ? v : v / worker.abs(v);
+			case FunctionT::real: return v.real();
+			case FunctionT::imag: return v.imag();
 			default: return worker.getNan();
 			}
 			return worker.getNan();

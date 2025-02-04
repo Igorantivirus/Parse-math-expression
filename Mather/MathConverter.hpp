@@ -26,11 +26,11 @@ namespace expr
 
 		bool isNum(const char c)
 		{
-			return (c >= '0' && c <= '9') || c == 'i';
+			return (c >= '0' && c <= '9');
 		}
 		bool isNum(const std::string& s)
 		{
-			return isNum(s[0]) || (s.size() >= 2 && (s[0] == '-' || s[0] == '.') && isNum(s[1])) || s == "nan" || s == "-nan" || s == "inf" || s == "-inf";
+			return isNum(s[0]) || (s.size() == 1 && s[0] == 'i') || (s.size() >= 2 && (s[0] == '-' || s[0] == '.') && isNum(s[1])) || s == "nan" || s == "-nan" || s == "inf" || s == "-inf";
 		}
 
 		const std::string toStr(const ActionT v) const
