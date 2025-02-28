@@ -48,7 +48,9 @@ namespace expr
 		frac,
 		sign,
 		real,
-		imag
+		imag,
+
+		phi
 	};
 
 	enum class TwoFunctionT : char
@@ -110,6 +112,7 @@ namespace expr
 			case FunctionT::sign: return v == Complex(0) ? v : v / worker.abs(v);
 			case FunctionT::real: return v.real();
 			case FunctionT::imag: return v.imag();
+			case FunctionT::phi: return worker.pow(Complex(2) * worker.getPi(), Complex(-0.5l)) * worker.exp(Complex(-0.5) * v*v);
 			default: return worker.getNan();
 			}
 			return worker.getNan();
