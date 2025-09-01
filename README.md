@@ -1,3 +1,7 @@
+> ⚠️ **Deprecated Project**  
+> This repository is no longer supported. But it is fully operational (for 2025).
+> A new relevant project is available here: [🔗 link to the new repository](https://github.com/Igorantivirus/MathWorker?tab=readme-ov-file)
+
 # Parse-math-expression
 
 ## Description
